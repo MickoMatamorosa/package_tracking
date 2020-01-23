@@ -1,0 +1,7 @@
+# backends
+backend/src/db.sqlite3
+backend/.vscode
+
+# frontends
+frontend/node_modules
+frontend/package-lock.json
