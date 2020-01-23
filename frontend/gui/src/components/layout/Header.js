@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -7,6 +7,10 @@ import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import Link from '@material-ui/core/Link';
 import { IconButton } from '@material-ui/core';
+import Logout from '@material-ui/icons/ExitToApp';
+
+import { logout, userAuth } from '../../services/request'
+import auth from '../../services/auth'
 
 const useStyles = makeStyles(theme => ({
     grow: {
@@ -49,24 +53,41 @@ const useStyles = makeStyles(theme => ({
     },
     login: {
         color: 'white', 
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     }
 }));
 
 const Header = props => {
+    
     const classes = useStyles();
     const [searchTxt, setSearchTxt] = useState("")
+
+    useEffect(() => {
+        if(localStorage.getItem('token')){
+            userAuth().then(res => {
+                auth.login(() => props.history.push('/branch'))}
+            ).catch(err => auth.logout(() => {}))
+        }
+    }, [])
 
     const submitTracking = () => {
         console.log(searchTxt)
     }
+
+    const exit = () => {
+        logout()
+        auth.logout(() => props.history.push('/'))
+    }
+
+    console.log(auth.authenticated)
+    
 
     return (
         <div className={classes.grow}>
         <AppBar position="static">
             <Toolbar>
             <Typography className={classes.title} variant="h6" noWrap>
-                Package Tracking
+                <Link href="/" className={classes.login}>Package Tracking</Link>
             </Typography>
             <div className={classes.search}>
                 <InputBase
@@ -87,7 +108,13 @@ const Header = props => {
             </div>
             <div className={classes.grow} />
             <div>
-                <Link href="/login" className={classes.login}>LOGIN</Link>
+                {
+                    auth.authenticated
+                    ? <IconButton onClick={exit}>
+                        <Logout color="secondary" />
+                      </IconButton>
+                    : <Link href="/login" className={classes.login}>LOGIN</Link>
+                }
             </div>
             </Toolbar>
         </AppBar>

@@ -1,5 +1,4 @@
-import { Redirect } from "react-router-dom";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'
 
 import Avatar from '@material-ui/core/Avatar';
@@ -13,7 +12,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-import { login } from '../../services/auth';
+import { login, userAuth } from '../../services/request';
+import auth from '../../services/auth';
 
 
 const useStyles = makeStyles(theme => ({
@@ -41,6 +41,14 @@ const SignIn = props => {
     const classes = useStyles();
     const [input, setInput] = useState({});
 
+    useEffect(() => {
+        if(localStorage.getItem('token')){
+            userAuth().then(res => {
+                auth.login(() => props.history.push('/branch'))}
+            ).catch(err => auth.logout(() => {}))
+        }
+    }, [])
+
     const handleInputChange = (e) => setInput({
         ...input, [e.currentTarget.name]: e.currentTarget.value
     })
@@ -51,14 +59,14 @@ const SignIn = props => {
         const {username, password} = input
         login(username, password)
         .then(res => {
-            console.log(props);
-            
-            props.setUser(res.user);
-            props.setIsAuth(true);
+            if(res) {
+                auth.login(() => props.history.push('/branch'))
+            }else{
+                console.log("Invalid Username or Password!!!");                
+            }
         })
     }
-
-    if(props.isAuth) return <Redirect to="/branch" />;
+   
 
     return (
         <Container component="main" maxWidth="xs">
@@ -66,7 +74,7 @@ const SignIn = props => {
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}><LockOutlinedIcon /></Avatar>
                 <Typography component="h1" variant="h5">Sign in</Typography>
-                <form method="POST" onSubmit={submit} className={classes.form} noValidate>
+                <form method="POST" onSubmit={submit} className={classes.form}>
                     <TextField
                         onChange={handleInputChange}
                         variant="outlined"
@@ -100,11 +108,11 @@ const SignIn = props => {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link href="/" variant="body2">Back</Link>
+                            <Link href="#" variant="body2">Forgot password?</Link>
                         </Grid>
                         <Grid item xs>
-                            <Grid container alignContent="flex-end">
-                                <Link href="#" variant="body2">Forgot password?</Link>
+                            <Grid container justify="flex-end" >
+                                <Link href="/" variant="body2">Back</Link>
                             </Grid>
                         </Grid>
                     </Grid>
