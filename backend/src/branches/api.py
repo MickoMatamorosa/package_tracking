@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions
 from .serializers import BranchSerializer, StatusFlowSerializer
-from .models import Branch
+from .models import Branch, StatusFlow
 from packages.serializers import PackageSerializer
 from packages.models import Package
 
@@ -19,12 +19,21 @@ class BranchViewSet(viewsets.ModelViewSet):
 
 # user's branch status flow viewset
 class StatusFlowViewSet(viewsets.ModelViewSet):
-    serializer_class = StatusFlowSerializer
     permission_classes = [permissions.IsAuthenticated,]
+    serializer_class = StatusFlowSerializer
 
     def get_queryset(self):
-        print(dir(self.request.user.branch))
-        return []
+        return StatusFlow.objects.filter(branch=self.request.user.branch)
 
     def perform_create(self, serializer):
-        serializer.save(branch=self.request.user.branch)
+        queue_no = 1
+        stype = self.request._data['branch_type']
+        last_queue = self.get_queryset().filter(branch_type=stype).last()
+        
+        if last_queue:
+            queue_no += last_queue.queue
+
+        serializer.save(
+            branch = self.request.user.branch,
+            queue = queue_no
+        )

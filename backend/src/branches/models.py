@@ -16,7 +16,10 @@ class Branch(models.Model):
 
 
 class StatusFlow(models.Model):
-    queue = models.IntegerField()
+    queue = models.IntegerField(null=True)
     branch_type = models.CharField(max_length=20, null=False)
     description = models.CharField(max_length=500, null=True)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['queue']
