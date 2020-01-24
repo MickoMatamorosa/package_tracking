@@ -12,7 +12,7 @@ import Login from "./components/accounts/SignIn";
 import PrivateRoute from "./components/common/PrivateRoute";
 import Branch from "./components/branch/Branch";
 
-import { userAuth } from './services/request'
+import { userAuth } from './services/authRequest'
 import auth from './services/auth'
 
 class App extends Component{
@@ -26,8 +26,6 @@ class App extends Component{
 
   componentDidMount(){
     if(localStorage.getItem('token')){
-      console.log("localstorage has token");
-      
       userAuth()
         .then(res => {
           const {username, email} = res
@@ -39,7 +37,6 @@ class App extends Component{
   }
 
   render(){
-    console.log(this.state);
     
     return (
       <Router>

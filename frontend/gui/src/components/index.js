@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 import Header from './layout/Header';
 
 class Main extends Component {
+    componentDidMount(){
+        
+    }
     
     render() {
         return (
             <Fragment>
-                <Header/>
+                <Header {...this.props}/>
             </Fragment>
         )
     }

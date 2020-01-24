@@ -9,7 +9,7 @@ import Link from '@material-ui/core/Link';
 import { IconButton } from '@material-ui/core';
 import Logout from '@material-ui/icons/ExitToApp';
 
-import { logout, userAuth } from '../../services/request'
+import { logout, userAuth } from '../../services/authRequest'
 import auth from '../../services/auth'
 
 const useStyles = makeStyles(theme => ({
@@ -75,11 +75,10 @@ const Header = props => {
     }
 
     const exit = () => {
-        logout()
-        auth.logout(() => props.history.push('/'))
+        logout().then(res => {
+            auth.logout(() => props.history.push('/'))
+        })
     }
-
-    console.log(auth.authenticated)
     
 
     return (
@@ -87,7 +86,7 @@ const Header = props => {
         <AppBar position="static">
             <Toolbar>
             <Typography className={classes.title} variant="h6" noWrap>
-                <Link href="/" className={classes.login}>Package Tracking</Link>
+                Package Tracking
             </Typography>
             <div className={classes.search}>
                 <InputBase
@@ -102,7 +101,7 @@ const Header = props => {
                 />
             </div>
             <div>
-                <IconButton size="small" onClick={submitTracking}>
+                <IconButton onClick={submitTracking}>
                     <SearchIcon  className={classes.searchIcon}/>
                 </IconButton>
             </div>

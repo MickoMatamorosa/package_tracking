@@ -27,7 +27,7 @@ export const userAuth = () => {
 
 // LOGOUT USER
 export const logout = () => {
-  axios
+  return axios
     .post("/api/auth/logout/", null, tokenConfig())
     .then(res => {
       localStorage.clear()

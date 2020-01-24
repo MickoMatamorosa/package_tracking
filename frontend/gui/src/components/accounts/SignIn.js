@@ -12,7 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-import { login, userAuth } from '../../services/request';
+import { login, userAuth } from '../../services/authRequest';
 import auth from '../../services/auth';
 
 
@@ -62,7 +62,7 @@ const SignIn = props => {
             if(res) {
                 auth.login(() => props.history.push('/branch'))
             }else{
-                console.log("Invalid Username or Password!!!");                
+                console.log("Invalid Username or Password!!!");
             }
         })
     }

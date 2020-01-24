@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import Header from '../layout/Header';
-import { userAuth } from '../../services/request';
+import { userAuth } from '../../services/authRequest';
 import auth from '../../services/auth';
 
 class Branch extends Component {
