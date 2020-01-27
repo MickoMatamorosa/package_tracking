@@ -25,4 +25,5 @@ class UserPackageViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        print(dir(serializer))
         serializer.save(from_branch=self.request.user)

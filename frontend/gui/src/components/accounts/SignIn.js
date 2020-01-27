@@ -9,32 +9,12 @@ import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
 import { login, userAuth } from '../../services/authRequest';
 import auth from '../../services/auth';
 
-
-const useStyles = makeStyles(theme => ({
-    paper: {
-        marginTop: theme.spacing(8),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    avatar: {
-        margin: theme.spacing(1),
-        backgroundColor: theme.palette.secondary.main,
-    },
-    form: {
-        width: '100%',
-        marginTop: theme.spacing(1),
-    },
-    submit: {
-        margin: theme.spacing(3, 0, 2),
-    },
-}));
+import useStyles from './SignIn.style'
 
 const SignIn = props => {
     
@@ -42,10 +22,11 @@ const SignIn = props => {
     const [input, setInput] = useState({});
 
     useEffect(() => {
+        // is already logged-in
         if(localStorage.getItem('token')){
             userAuth().then(res => {
-                auth.login(() => props.history.push('/branch'))}
-            ).catch(err => auth.logout(() => {}))
+                auth.login(() => props.history.push('/branch'))
+            }).catch(err => auth.logout(() => {}))
         }
     }, [])
 

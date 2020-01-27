@@ -23,7 +23,7 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
     serializer_class = StatusFlowSerializer
 
     def get_queryset(self):
-        return StatusFlow.objects.filter(branch=self.request.user.branch)
+        return self.request.user.branch.statusflow_set()
 
     def perform_create(self, serializer):
         queue_no = 1

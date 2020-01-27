@@ -1,66 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import React, { useState, useEffect, Fragment } from 'react';
+
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+
 import SearchIcon from '@material-ui/icons/Search';
-import Link from '@material-ui/core/Link';
 import { IconButton } from '@material-ui/core';
-import Logout from '@material-ui/icons/ExitToApp';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 
-import { logout, userAuth } from '../../services/authRequest'
-import auth from '../../services/auth'
+import { logout, userAuth } from '../../services/authRequest';
+import auth from '../../services/auth';
 
-const useStyles = makeStyles(theme => ({
-    grow: {
-        flexGrow: 1,
-    },
-    title: {
-        display: 'none',
-        [theme.breakpoints.up('sm')]: {
-            display: 'block',
-        },
-    },
-    search: {
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
-        },
-        marginRight: theme.spacing(1),
-        marginLeft: 0,
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            marginLeft: theme.spacing(3),
-            width: 'auto',
-        },
-    },
-    searchIcon: {
-        color: 'white'
-    },
-    inputRoot: {
-        color: 'inherit',
-    },
-    inputInput: {
-        padding: theme.spacing(1, 1, 1, 1),
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-            width: 200,
-        },
-    },
-    login: {
-        color: 'white', 
-        fontWeight: 'bold',
-    }
-}));
+import useStyles from './Header.style';
+
+import Profile from '../branch/Profile'
+import StatusFlow from '../branch/StatusFlow'
 
 const Header = props => {
     
     const classes = useStyles();
     const [searchTxt, setSearchTxt] = useState("")
+
 
     useEffect(() => {
         if(localStorage.getItem('token')){
@@ -75,10 +41,93 @@ const Header = props => {
     }
 
     const exit = () => {
+        setAnchorEl(null);
         logout().then(res => {
             auth.logout(() => props.history.push('/'))
         })
     }
+
+    // Modal
+    const [open, setOpen] = useState(false);
+    const [modal, setModal] = useState(false);
+
+    const handleOpen = type => {
+        handleMenuClose();
+        setOpen(true);
+        setModal(type)
+    }
+    const handleClose = () => {
+        handleMenuClose();
+        setOpen(false);
+        setModal(false)
+    }
+
+    const renderModal = (<Modal
+        aria-labelledby="spring-modal-title"
+        aria-describedby="spring-modal-description"
+        className={classes.modal}
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{timeout: 500}}
+    >
+        {/* {   modal === 'profile'
+        ?   <div className={classes.paper}>
+                <h2 id="spring-modal-title">Profile</h2>
+                <p id="spring-modal-description">react-spring animates me.</p>
+            </div>
+        :   modal === 'status-flow'
+        ?   <div className={classes.paper}>
+                <h2 id="spring-modal-title">Status Flow</h2>
+                <p id="spring-modal-description">react-spring animates me.</p>
+            </div>
+        :   <Fragment />
+        } */}
+        {   modal === 'profile'
+        ?   <div className={classes.paper}>
+                <h2 id="spring-modal-title">Profile</h2>
+                <div id="spring-modal-description"><Profile /></div>
+            </div>
+        :   modal === 'status-flow'
+        ?   <div className={classes.paper}>
+                <h2 id="spring-modal-title">Status Flow</h2>
+                <div id="spring-modal-description"><StatusFlow/></div>
+            </div>
+        :   <Fragment />
+        }
+    </Modal>)
+
+    // Menu
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const isMenuOpen = Boolean(anchorEl);
+    
+    const handleProfileMenuOpen = event => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const menuId = 'primary-search-account-menu';
+    const menuPosition = { vertical: 'top', horizontal: 'right' }
+
+    const renderMenu = (
+        <Menu
+            anchorEl={anchorEl}
+            anchorOrigin={menuPosition}
+            id={menuId}
+            keepMounted
+            transformOrigin={menuPosition}
+            open={isMenuOpen}
+            onClose={handleMenuClose}
+        >
+            <MenuItem onClick={() => handleOpen('profile')}>Profile</MenuItem>
+            <MenuItem onClick={() => handleOpen('status-flow')}>Status Flow</MenuItem>
+            <MenuItem onClick={exit}>Logout</MenuItem>
+        </Menu>
+    );
     
 
     return (
@@ -107,16 +156,24 @@ const Header = props => {
             </div>
             <div className={classes.grow} />
             <div>
-                {
-                    auth.authenticated
-                    ? <IconButton onClick={exit}>
-                        <Logout color="secondary" />
+                {   auth.authenticated
+                    ? <IconButton
+                        edge="end"
+                        aria-label="account of current user"
+                        aria-controls={menuId}
+                        aria-haspopup="true"
+                        onClick={handleProfileMenuOpen}
+                        color="inherit"
+                      >
+                        <AccountCircle />
                       </IconButton>
                     : <Link href="/login" className={classes.login}>LOGIN</Link>
                 }
             </div>
             </Toolbar>
         </AppBar>
+        {renderModal}
+        {renderMenu}
         </div>
     );
 }

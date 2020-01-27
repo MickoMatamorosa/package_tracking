@@ -1,7 +1,5 @@
-import axios from 'axios'
-
-const config = { headers: { "Content-Type": "application/json" } };
-
+import axios from 'axios';
+import { config, tokenConfig } from './headers'
 
 // LOGIN USER
 export const login = async (username, password) => {
@@ -27,29 +25,9 @@ export const userAuth = () => {
 
 // LOGOUT USER
 export const logout = () => {
+  localStorage.clear()
   return axios
     .post("/api/auth/logout/", null, tokenConfig())
-    .then(res => {
-      localStorage.clear()
-      return res.data
-    })
+    .then(res => res.data)
     .catch(err => console.log(err));
 };
-
-
-// Setup config with token - helper function
-const tokenConfig = () => {
-  // Get token from state
-  const token = localStorage.getItem('token');
-
-  // Headers
-  const configs = config
-
-  // If token, add to headers config
-  if (token) {
-    configs.headers["Authorization"] = `Token ${token}`;
-  }
-
-  return configs;
-};
-  
