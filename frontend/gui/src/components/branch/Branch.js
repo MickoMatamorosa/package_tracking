@@ -28,9 +28,7 @@ class Branch extends Component {
                 .then(res => {
                     const {name, address} = res
                     this.setState({name, address})
-                }).catch(err => {
-                    console.log(err);                    
-                })
+                }).catch(err => console.log(err))
         }
     }
     

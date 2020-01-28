@@ -72,27 +72,19 @@ const Header = props => {
         BackdropComponent={Backdrop}
         BackdropProps={{timeout: 500}}
     >
-        {/* {   modal === 'profile'
-        ?   <div className={classes.paper}>
-                <h2 id="spring-modal-title">Profile</h2>
-                <p id="spring-modal-description">react-spring animates me.</p>
-            </div>
-        :   modal === 'status-flow'
-        ?   <div className={classes.paper}>
-                <h2 id="spring-modal-title">Status Flow</h2>
-                <p id="spring-modal-description">react-spring animates me.</p>
-            </div>
-        :   <Fragment />
-        } */}
         {   modal === 'profile'
         ?   <div className={classes.paper}>
                 <h2 id="spring-modal-title">Profile</h2>
-                <div id="spring-modal-description"><Profile /></div>
+                <div id="spring-modal-description">
+                    <Profile handleClose={handleClose} />
+                </div>
             </div>
         :   modal === 'status-flow'
         ?   <div className={classes.paper}>
                 <h2 id="spring-modal-title">Status Flow</h2>
-                <div id="spring-modal-description"><StatusFlow/></div>
+                <div id="spring-modal-description">
+                    <StatusFlow handleClose={handleClose} />
+                </div>
             </div>
         :   <Fragment />
         }

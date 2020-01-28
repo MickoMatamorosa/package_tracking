@@ -1,8 +1,9 @@
 from rest_framework import routers
-from branches.api import BranchViewSet, StatusFlowViewSet
+from branches.api import BranchViewSet, StatusFlowViewSet, UserBranchViewSet
 
-router = routers.SimpleRouter()
-router.register(r'api/branch/statusflow', StatusFlowViewSet, 'status_flow')
-router.register(r'api/branch', BranchViewSet, 'branches')
+router = routers.DefaultRouter()
+router.register(r'^api/branch/statusflow', StatusFlowViewSet, 'status_flow')
+router.register(r'^api/auth/branch', UserBranchViewSet, 'user_branch')
+router.register(r'^api/branch', BranchViewSet, 'branches')
 
 urlpatterns = router.urls

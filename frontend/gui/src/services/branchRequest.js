@@ -4,7 +4,7 @@ import { config, tokenConfig } from './headers'
 // branch profile
 export const branchProfile = () => {
     return axios
-        .get("/api/branch", tokenConfig())
+        .get("/api/auth/branch", tokenConfig())
         .then(res => res.data[0])
         .catch(err => err)
 }
@@ -13,10 +13,23 @@ export const branchProfile = () => {
 
 
 // update branch profile
-
+export const updateUserProfile = body => {
+    const strBody = JSON.stringify(body);
+    return branchProfile().then(res => {
+        return axios
+            .patch(`/api/branch/${res.id}/`, strBody, tokenConfig())
+            .then(res => res.data)
+            .catch(err => err)
+    })
+}
 
 // branch all status flow
-
+export const branchStatusFlow = () => {
+    return axios
+        .get("/api/branch/statusflow", tokenConfig())
+        .then(res => res.data)
+        .catch(err => err)
+}
 
 // create status flow
 
