@@ -24,7 +24,7 @@ export const updateUserProfile = body => {
 }
 
 // branch all status flow
-export const branchStatusFlow = () => {
+export const getBranchStatusFlow = () => {
     return axios
         .get("/api/branch/statusflow", tokenConfig())
         .then(res => res.data)

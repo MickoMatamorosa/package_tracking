@@ -32,9 +32,7 @@ class Branch extends Component {
         }
     }
     
-    render() {
-        console.log(this.state.name);
-        
+    render() {        
         return (
             <Fragment>
                 <Header {...this.props} />

@@ -1,124 +1,129 @@
-import React, { Component } from 'react';
+import React, { forwardRef, useEffect, useState, Component } from 'react';
+import MaterialTable from 'material-table';
+import AddBox from '@material-ui/icons/AddBox';
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import Check from '@material-ui/icons/Check';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import Clear from '@material-ui/icons/Clear';
+import DeleteOutline from '@material-ui/icons/DeleteOutline';
+import Edit from '@material-ui/icons/Edit';
+import FilterList from '@material-ui/icons/FilterList';
+import FirstPage from '@material-ui/icons/FirstPage';
+import LastPage from '@material-ui/icons/LastPage';
+import Remove from '@material-ui/icons/Remove';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+import Search from '@material-ui/icons/Search';
+import ViewColumn from '@material-ui/icons/ViewColumn';
 
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import MenuItem from '@material-ui/core/MenuItem';
+import { getBranchStatusFlow } from '../../services/branchRequest'
 
-import { branchStatusFlow } from '../../services/branchRequest';
-import { Grid } from '@material-ui/core';
+const tableIcons = {
+    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+    Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
+    Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+    Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
+    DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+    Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
+    Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
+    Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
+    FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+    LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+    NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+    PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
+    ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+    Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
+    SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+    ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+};
 
-export default class StatusFlow extends Component {
+export default class StatusFlow extends Component{
     constructor(props){
         super(props);
-
         this.state = {
-            isEmpty: true,
-            shrink: true,
-            statusFlow: [],
+            columns: [
+                { title: 'Queue', field: 'queue' },
+                { title: 'Type', field: 'branch_type',
+                  lookup: { 'sending': 'Sending', 'receiving': 'Receiving' }
+                },
+                { title: 'Descriptions', field: 'description' }
+            ],
+            data: [],
         }
     }
 
     componentDidMount(){
-        branchStatusFlow()
+        getBranchStatusFlow()
         .then(res => {
-            this.setState({ statusFlow: res })
-        }).catch(err => console.log("can't fetch branch profile"))
-    }
+            const columns = this.state.columns
+            columns[0].lookup = {
+                ...res.map(({queue}) => ({[queue]:queue}))
+            }
+            console.log("columns", columns);
+            console.log("orig res", res);
+            const data = res.map(
+                ({ queue, branch_type, description }) => 
+                ({ queue, branch_type, description })
+            )
 
-    handleChange = e => {
-        // let isUserUpdate = false
-        // const { origProfile } = this.state
-        // const newProfile = {
-        //     ...origProfile,
-        //     [e.target.name]: e.target.value
-        // }
-
-        // // check all items is really update
-        // for(let k in this.state.origProfile){
-        //     if(origProfile[k] !== newProfile[k]){
-        //         isUserUpdate = true
-        //     }
-        // }
-
-        // this.setState({ 
-        //     [e.target.name]: e.target.value,
-        //     shrink: Boolean(e.target.value),
-        //     isUserUpdate
-        // })
-    }
-
-    handleReset = () => {
-        // const { name, address } = this.state.origProfile;
-        // this.setState({ name, address });
-    }
-
-    add = () => {
-        // const { name, address } = this.state
-        // updateUserProfile({ name, address })
-        // .then(res => this.props.handleClose())
+            console.log("mapped res", data);
+            
+            this.setState({ columns, data })
+        })
+        .catch(err => console.log(err))
     }
 
     render() {
-        const { isEmpty, shrink } = this.state
+        const { state, setState } = this
+        console.log("data", state.data);
+        console.log("columns", state.columns);
         
         return (
-            <form autoComplete="off" style={{"width": 300}}>
-                <Grid container xs={12}>
-                    <Grid item xs={12}>
-                        <Grid container justify="space-between"  spacing={2}>
-                        <Grid item xs={3}>
-                            <InputLabel ref={inputLabel}>Age</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-outlined-label"
-                                id="demo-simple-select-outlined"
-                                value={age}
-                                onChange={handleChange}
-                                labelWidth={labelWidth}
-                            >
-                                <MenuItem value=""><em>Last</em></MenuItem>
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
-                            </Select>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField fullWidth
-                                id="standard-required"
-                                name="address"
-                                label="Address"
-                                defaultValue="Set Branch Address"
-                                // value={address}
-                                onChange={this.handleChange}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField fullWidth
-                                id="standard-required"
-                                name="remarks"
-                                label="Description:"
-                                // value={address}
-                                onChange={this.handleChange}
-                            />
-                        </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Grid container 
-                            justify="space-around"
-                            style={{"marginTop": 15 }}
-                            spacing={1}>
-                            <Button onClick={this.add} disabled={isEmpty}
-                                variant="contained" color="primary">
-                                Add
-                            </Button>
-                            <Button onClick={this.handleReset} disabled={isEmpty}
-                                variant="contained">
-                                Reset
-                            </Button>
-                        </Grid>
-                    </Grid>                    
-                </Grid>                
-            </form>
-        )
+        <div>Hi</div>
+            // <MaterialTable
+            //     icons={tableIcons}
+            //     title=" "
+            //     columns={state.columns}
+            //     data={state.temp}
+            //     editable={{
+            //         onRowAdd: newData =>
+            //         new Promise(resolve => {
+            //             setTimeout(() => {
+            //             resolve();
+            //             setState(prevState => {
+            //                 const data = [...prevState.data];
+            //                 data.push(newData);
+            //                 return { ...prevState, data };
+            //             });
+            //             }, 600);
+            //         }),
+            //         onRowUpdate: (newData, oldData) =>
+            //         new Promise(resolve => {
+            //             setTimeout(() => {
+            //                 resolve();
+            //                 if (oldData) {
+            //                     setState(prevState => {
+            //                         const data = [...prevState.data];
+            //                         data[data.indexOf(oldData)] = newData;
+            //                         return { ...prevState, data };
+            //                     });
+            //                 }
+            //             }, 600);
+            //         }),
+            //         onRowDelete: oldData =>
+            //         new Promise(resolve => {
+            //             setTimeout(() => {
+            //                 resolve();
+            //                 setState(prevState => {
+            //                     const data = [...prevState.data];
+            //                     data.splice(data.indexOf(oldData), 1);
+            //                     return { ...prevState, data };
+            //                 });
+            //             }, 600);
+            //         }),
+            //     }}
+            // />
+        );
     }
 }
