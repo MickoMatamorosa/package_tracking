@@ -6,7 +6,10 @@ export const branchProfile = () => {
     return axios
         .get("/api/auth/branch", tokenConfig())
         .then(res => res.data[0])
-        .catch(err => err)
+        .catch(err => {
+            localStorage.clear()
+            return false
+        })
 }
 
 // branch first login
@@ -38,6 +41,14 @@ export const getBranchStatusFlow = () => {
 
 
 // delete status flow
+export const deleteStatusFlow = id => {
+    return axios
+        .delete(`/api/branch/statusflow/${id}`, tokenConfig())
+        .then(res => {
+            console.log(id, "has been deleted");
+        })
+        .catch(err => err)
+}
 
 
 // get branch sending packages

@@ -14,7 +14,7 @@ class BranchSerializer(serializers.ModelSerializer):
 class StatusFlowSerializer(serializers.ModelSerializer):
   class Meta:
     model = StatusFlow
-    fields = ('queue', 'branch_type', 'description')
+    fields = ['id', 'queue', 'branch_type', 'description']
     ordering = ['queue']
 
 
