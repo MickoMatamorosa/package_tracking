@@ -42,13 +42,17 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         queue_no = 1
-        stype = self.request._data['branch_type']
-        last_queue = self.get_queryset().filter(branch_type=stype).last()
+        stype = self.request._data['branch_type'].lower()
+        last_queue = StatusFlow.objects.filter(
+            branch=self.request.user.branch,
+            branch_type=stype
+        ).last()
         
         if last_queue:
             queue_no += last_queue.queue
 
         serializer.save(
             branch = self.request.user.branch,
+            branch_type = stype,
             queue = queue_no
         )
