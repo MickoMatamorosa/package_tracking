@@ -3,6 +3,7 @@ from packages.models import Package, PackageStatus
 
 # Package Serializer  
 class PackageSerializer(serializers.ModelSerializer):
+
   class Meta:
     model = Package
     fields = ('tracking_number', 'timestamp')
