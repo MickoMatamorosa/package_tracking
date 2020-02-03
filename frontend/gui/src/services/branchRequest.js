@@ -29,15 +29,29 @@ export const updateUserProfile = body => {
 // branch all status flow
 export const getBranchStatusFlow = () => {
     return axios
-        .get("/api/branch/statusflow", tokenConfig())
+        .get("/api/branch/statusflow?ordering=branch_type", tokenConfig())
         .then(res => res.data)
         .catch(err => err)
 }
 
 // create status flow
+export const addBranchStatusFlow = body => {
+    const strBody = JSON.stringify(body);
+    return axios
+        .post("/api/branch/statusflow/", strBody, tokenConfig())
+        .then(res => res.data)
+        .catch(err => err)
+}
 
 
 // update status flow
+export const updateStatusFlow = body => {
+    const strBody = JSON.stringify(body);
+    return axios
+        .patch(`/api/branch/statusflow/${body.id}/`, strBody, tokenConfig())
+        .then(res => res.data)
+        .catch(err => err)
+}
 
 
 // delete status flow

@@ -9,8 +9,8 @@ def make_tracking():
     return uuid4().node
 
 class Package(models.Model):
-    # client_fullname = models.CharField(max_length=200, null=True)
-    # client_address = models.CharField(max_length=500, null=True)
+    client_fullname = models.CharField(max_length=200)
+    client_address = models.CharField(max_length=500)
     tracking_number = models.CharField(
         max_length=50,
         editable=False,

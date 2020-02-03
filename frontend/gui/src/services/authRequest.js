@@ -19,7 +19,7 @@ export const userAuth = () => {
   return axios
     .get("/api/auth/user", tokenConfig())
     .then(res => res.data)
-    .catch(err => err)
+    .catch(err => localStorage.clear())
 }
 
 
