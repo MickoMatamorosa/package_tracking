@@ -1,28 +1,41 @@
 import axios from 'axios';
-import { config, tokenConfig } from './headers'
+import { config, tokenConfig } from './headers';
+import {userAuth} from './authRequest'
 
 // branch profile
 export const branchProfile = () => {
+    // user info instead branch if no branch
     return axios
         .get("/api/auth/branch", tokenConfig())
         .then(res => res.data[0])
         .catch(err => {
-            localStorage.clear()
-            return false
+            return userAuth()
+                .then(res => ({
+                    user: res.id,
+                    name: "",
+                    address: ""
+                }))
         })
 }
 
 // branch first login
 
 
-// update branch profile
-export const updateUserProfile = body => {
-    const strBody = JSON.stringify(body);
+// saveUserProfile branch profile
+export const saveUserProfile = body => {
     return branchProfile().then(res => {
+        body.user = res.user
+        const strBody = JSON.stringify(body);
+        
         return axios
             .patch(`/api/branch/${res.id}/`, strBody, tokenConfig())
             .then(res => res.data)
-            .catch(err => err)
+            .catch(err => {
+                return axios
+                    .post(`/api/branch/`, strBody, tokenConfig())
+                    .then(res => res.data)
+                    .catch(err => err)
+            })
     })
 }
 
