@@ -52,7 +52,7 @@ export default class Profile extends Component {
 
     handleReset = () => {
         const { name, address } = this.state.origProfile;
-        this.setState({ name, address });
+        this.setState({ name, address, isUserUpdate: false });
     }
 
     save = () => {

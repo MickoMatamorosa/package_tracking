@@ -23,9 +23,9 @@ export const StyledTableRow = withStyles(theme => ({
 
 
 export const useStyles = makeStyles(theme => ({
-    table: { minWidth: 700, },
-    queue: { width: 20, },
-    type: { width: 100, },
+    table: { minWidth: 800, },
+    queue: { width: 55, },
+    type: { width: 95, },
     actions: { width: 100, },
     selectEmpty: { marginTop: theme.spacing(2), },
     right: {textAlign: 'right'}
