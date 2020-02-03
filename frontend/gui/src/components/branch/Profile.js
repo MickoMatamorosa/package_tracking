@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
-import { branchProfile, updateUserProfile } from '../../services/branchRequest';
+import { branchProfile, saveUserProfile } from '../../services/branchRequest';
 import { Grid } from '@material-ui/core';
 
 export default class Profile extends Component {
@@ -11,9 +11,14 @@ export default class Profile extends Component {
         super(props);
 
         this.state = {
+            user: null,
             name: null,
             address: null,
-            shrink: true,
+            shrink: {
+                name: false,
+                address: false,
+            },
+            isValid: true,
             isUserUpdate: false,
             origProfile: null
         }
@@ -24,16 +29,26 @@ export default class Profile extends Component {
         .then(res => {
             const { name, address } = res
             const origProfile = { name, address }
-            this.setState({ name, address, origProfile })
-        }).catch(err => console.log("can't fetch branch profile"))
+            
+            this.setState({ 
+                name, address, origProfile,
+                shrink: {
+                    name: Boolean(name),
+                    address: Boolean(address),
+                },
+            })
+        }).catch(err => {
+            console.log("can't fetch branch profile", err)
+        })
     }
 
     handleChange = e => {
-        let isUserUpdate = false
-        const { origProfile } = this.state
+        const {name, value} = e.target;
+        let isUserUpdate = false;
+        const { origProfile } = this.state;
         const newProfile = {
             ...origProfile,
-            [e.target.name]: e.target.value
+            [name]: value
         }
 
         // check all items is really update
@@ -42,52 +57,67 @@ export default class Profile extends Component {
                 isUserUpdate = true
             }
         }
+        
+        console.log(Boolean(value));
 
-        this.setState({ 
-            [e.target.name]: e.target.value,
-            shrink: Boolean(e.target.value),
+        this.setState(({shrink}) => ({
+            [name]: value,
+            shrink: {
+                ...shrink, 
+                [name]: Boolean(value)
+            },
+            isValid: Boolean(value),
             isUserUpdate
-        })
+        }))
     }
 
     handleReset = () => {
         const { name, address } = this.state.origProfile;
-        this.setState({ name, address, isUserUpdate: false });
+        this.setState({ 
+            name, address,
+            isUserUpdate: false,
+            shrink: {
+                name: true,
+                address: true,
+            },
+        });
     }
 
     save = () => {
-        const { name, address } = this.state
-        updateUserProfile({ name, address })
-        .then(res => this.props.handleClose())
+        const { name, address } = this.state;
+        saveUserProfile({ name, address })
+        .then(res => {
+            this.props.setFirstLogin(false);
+            this.props.handleClose();
+        })
     }
 
     render() {
-        const { shrink, name, address, isUserUpdate } = this.state
-        
+        const { shrink, name, address, isUserUpdate, isValid } = this.state;
         return (
             <form autoComplete="off">
                 <TextField fullWidth
                     id="standard-required"
                     name="name"
                     label="Branch Name"
-                    defaultValue="Set Branch Name"
                     value={name}
-                    InputLabelProps={{ shrink }}
+                    InputLabelProps={{ shrink: shrink.name }}
                     onChange={this.handleChange}
                 />
                 <TextField fullWidth
                     id="standard-required"
                     name="address"
                     label="Address"
-                    defaultValue="Set Branch Address"
                     value={address}
+                    InputLabelProps={{ shrink: shrink.address }}
                     onChange={this.handleChange}
                 />
                 <Grid container 
                     justify="space-around"
                     style={{"marginTop": 15 }}
                     spacing={1}>
-                    <Button onClick={this.save} disabled={!isUserUpdate}
+                    <Button onClick={this.save} 
+                        disabled={!isUserUpdate || !isValid}
                         variant="contained" color="primary">
                         Save
                     </Button>
