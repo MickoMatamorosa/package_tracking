@@ -15,6 +15,40 @@ class PackageViewSet(viewsets.ReadOnlyModelViewSet):
 class UserPackageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,]
     serializer_class = PackageSerializer
+    
+    def get_queryset(self):
+        _queryset = []
+        user = self.request.user
+        packages = Package.objects.filter
+        package_sent = packages(from_branch=user.id)
+        package_receive = packages(to_branch=user.branch)
+        package_type = self.request.query_params.get('type', None)
+        if package_type == 'sending':
+            _queryset.extend(package_sent)
+        elif package_type == 'receiving':
+            _queryset.extend(package_receive)
+        elif package_type == 'completed':
+            completed_packages = Package.objects.filter(completed=True).filter
+            _queryset.extend(completed_packages(from_branch=user.id))
+            _queryset.extend(completed_packages(to_branch=user.branch))
+        else:
+            _queryset.extend(package_sent)
+            _queryset.extend(package_receive)
+
+        trace = self.request.query_params.get('trace', None)
+        print("tracking", trace)
+        if trace:
+            _queryset = packages(tracking_number=trace)
+
+        return _queryset
+
+    def perform_create(self, serializer):
+        serializer.save(from_branch=self.request.user)
+
+# user packages viewset (sending, receiving, sent)
+class UserPackageSentViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated,]
+    serializer_class = PackageSerializer
 
     def get_queryset(self):
         queryset = []
@@ -25,5 +59,4 @@ class UserPackageViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        print(dir(serializer))
         serializer.save(from_branch=self.request.user)

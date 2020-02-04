@@ -9,16 +9,16 @@ export const branchProfile = () => {
         .get("/api/auth/branch", tokenConfig())
         .then(res => res.data[0])
         .catch(err => {
-            return userAuth()
-                .then(res => ({
-                    user: res.id,
-                    name: "",
-                    address: ""
-                }))
+            try{
+                return userAuth()
+                    .then(res => ({
+                        user: res.id,
+                        name: "",
+                        address: ""
+                    }))
+            }catch(e){}
         })
 }
-
-// branch first login
 
 
 // saveUserProfile branch profile
@@ -78,7 +78,14 @@ export const deleteStatusFlow = id => {
 }
 
 
-// get branch sending packages
-
-
-// get branch receiving packages
+// get branch packages
+export const getBranchPackages = (type, trace) => {
+    let api = `/api/user/package?`;
+    api += type ? `type=${type}` : '';
+    api += type && trace ? '&' : '';
+    api += trace ? `trace=${trace}` : '';
+    return axios
+        .get(api, tokenConfig())
+        .then(res => res.data)
+        .catch(err => err)
+}

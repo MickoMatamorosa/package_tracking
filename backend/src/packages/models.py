@@ -11,17 +11,22 @@ def make_tracking():
 class Package(models.Model):
     client_fullname = models.CharField(max_length=200)
     client_address = models.CharField(max_length=500)
+    completed = models.BooleanField(default=False)
+
     tracking_number = models.CharField(
         max_length=50,
         editable=False,
         default=make_tracking
     )
+
     timestamp = models.DateTimeField(auto_now_add=True)
+
     from_branch = models.ForeignKey(
         User,
         related_name="sender",
         on_delete=models.CASCADE
     )
+
     to_branch = models.ForeignKey(
         Branch,
         related_name="receiver",

@@ -54,8 +54,6 @@ export default ({queue, refreshTableData}) => {
     }
     
     const last = queue[state.branch_type][queue.length - 1] + 1;
-    console.log(queue);
-    console.log(last);
 
     return (
         <StyledTableRow>
@@ -102,8 +100,6 @@ export default ({queue, refreshTableData}) => {
                         <IconButton onClick={cancelAddNew}><Close /></IconButton>
                     </Fragment>
                 }
-                
-                
             </StyledTableCell>
         </StyledTableRow>
     );

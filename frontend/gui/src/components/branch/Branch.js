@@ -14,7 +14,8 @@ class Branch extends Component {
 
         this.state = {
             name: null,
-            address: null
+            address: null,
+            search: ""
         }
     }
 
@@ -31,12 +32,23 @@ class Branch extends Component {
                 }).catch(err => console.log(err))
         }
     }
+
+    submitTracking = (search) => {
+        console.log("submit search", search);
+        
+        this.setState({search})
+    }
     
     render() {        
+        const {submitTracking, props, state} = this
         return (
             <Fragment>
-                <Header {...this.props} />
-                <Packages />
+                <Header {...props}
+                    {...{submitTracking}}
+                />
+                <Packages {...props}
+                    search={state.search}
+                />
             </Fragment>
         )
     }

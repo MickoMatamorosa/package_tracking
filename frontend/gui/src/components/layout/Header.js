@@ -37,8 +37,11 @@ const Header = props => {
         setModal(type)
     }
 
-    const submitTracking = () => {
-        console.log(searchTxt)
+    const handleChange = e => {
+        setSearchTxt(e.target.value)
+        if(!e.target.value) {
+            props.submitTracking("")
+        }
     }
 
     return (
@@ -57,34 +60,34 @@ const Header = props => {
                         input: classes.inputInput,
                     }}
                     inputProps={{ 'aria-label': 'search' }}
-                    onChange={e => setSearchTxt(e.target.value)}
+                    onChange={handleChange}
                 />
             </div>
             <div>
-                <IconButton onClick={submitTracking}>
+                <IconButton onClick={() => props.submitTracking(searchTxt)}>
                     <SearchIcon  className={classes.searchIcon}/>
                 </IconButton>
             </div>
             <div className={classes.grow} />
             <div>
-                {   auth.authenticated
-                    ? <IconButton
-                        edge="end"
-                        aria-label="account of current user"
-                        aria-controls="primary-search-account-menu"
-                        aria-haspopup="true"
-                        onClick={handleProfileMenuOpen}
-                        color="inherit"
-                      >
-                        <AccountCircle />
-                      </IconButton>
-                    : <Link href="/login" className={classes.login}>LOGIN</Link>
+                { auth.authenticated
+                  ? <IconButton
+                      edge="end"
+                      aria-label="account of current user"
+                      aria-controls="primary-search-account-menu"
+                      aria-haspopup="true"
+                      onClick={handleProfileMenuOpen}
+                      color="inherit">
+                      <AccountCircle />
+                    </IconButton>
+                  : <Link href="/login" className={classes.login}>LOGIN</Link>
                 }
             </div>
             </Toolbar>
         </AppBar>
         <HeaderModal {...props} {...{
-            handleOpen, handleMenuClose, open, modal, setOpen, setModal
+            handleOpen, handleMenuClose,
+            open, modal, setOpen, setModal
         }} />
         <HeaderMenu {...props} {...{
             handleOpen, setAnchorEl, 
