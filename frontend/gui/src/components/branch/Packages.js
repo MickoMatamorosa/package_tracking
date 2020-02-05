@@ -9,11 +9,14 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 
 import { getBranchPackages } from '../../services/branchRequest'
 import { StyledTableRow, StyledTableCell, useStyles } from './Styler'
 import PackageDetails from './PackageDetails'
-import TablePaginationActions from './PackagePagination'
+import TablePaginationActions from './PackagePagination';
+import NewPackage from './NewPackage'
 
 
 export default props => {
@@ -22,6 +25,8 @@ export default props => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
+  const [openNew, setOpenNew] = useState(false)
+
   const [pack, setPack] = useState({
       tracking_number: false,
       client_fullname: '',
@@ -42,17 +47,19 @@ export default props => {
         setPack(pack)
     }
 
+  const freshData = () => {
+    getBranchPackages()
+    .then(res => {
+        setData(res)
+        setSearch(props.search)
+    })
+  }
+
   useEffect(() => {
     if(search !== props.search){
         getBranchPackages(null, props.search)
         .then(res => setData(res))
-    } else {
-        getBranchPackages()
-        .then(res => {
-            setData(res)
-            setSearch(props.search)
-        })
-    }
+    } else freshData()
   }, [props.search])
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
@@ -68,6 +75,18 @@ export default props => {
 
   return (<Fragment>
     <PackageDetails {...{pack, closeView}}/>
+    <NewPackage {...{openNew, setOpenNew, freshData}}/>
+    <div className={classes.addWrapper}>
+      <Fab size="medium"
+        color="primary"
+        aria-label="add"
+        variant="extended"
+        className={classes.fab}
+        onClick={() => setOpenNew(true)}
+        >
+        <AddIcon />New Package
+      </Fab>
+    </div>
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="custom pagination table">
         <TableHead>
@@ -86,7 +105,8 @@ export default props => {
             ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : data
           ).map(row => (
-            <StyledTableRow key={row.id} onClick={() => packageStatus(row)}>
+            <StyledTableRow key={row.id} className={classes.pack}
+              onClick={() => packageStatus(row)}>
               <StyledTableCell align="center">{row.tracking_number}</StyledTableCell>
               <StyledTableCell align="center">{row.client_fullname}</StyledTableCell>
               <StyledTableCell align="center">{row.client_address}</StyledTableCell>
@@ -96,7 +116,6 @@ export default props => {
               <StyledTableCell align="center">actions</StyledTableCell>
             </StyledTableRow>
           ))}
-
           {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
               <TableCell colSpan={6} />

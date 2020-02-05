@@ -22,14 +22,12 @@ class Package(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     from_branch = models.ForeignKey(
-        User,
-        related_name="sender",
+        User, related_name="sender",
         on_delete=models.CASCADE
     )
 
     to_branch = models.ForeignKey(
-        Branch,
-        related_name="receiver",
+        Branch, related_name="receiver",
         on_delete=models.CASCADE
     )
 

@@ -28,7 +28,16 @@ export const useStyles = makeStyles(theme => ({
     type: { width: 95, },
     actions: { width: 100, },
     selectEmpty: { marginTop: theme.spacing(2), },
-    right: {textAlign: 'right'}
+    right: {textAlign: 'right'},
+    addWrapper: {
+        padding: '5px',
+        position: 'relative',
+        height: 40
+    },
+    fab: {
+        position: 'absolute',
+        right: 5
+    }
 }));
 
 export const modalStyle = makeStyles(theme => ({
@@ -84,5 +93,8 @@ export const modalStyle = makeStyles(theme => ({
         border: '2px solid #000',
         boxShadow: theme.shadows[5],
         padding: theme.spacing(2, 4, 3),
+    },
+    pack: {
+        cursor: 'pointer'
     },
 }));

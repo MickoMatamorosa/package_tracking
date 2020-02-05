@@ -8,16 +8,17 @@ export const branchProfile = () => {
     return axios
         .get("/api/auth/branch", tokenConfig())
         .then(res => res.data[0])
-        .catch(err => {
-            try{
-                return userAuth()
-                    .then(res => ({
+        .catch(err => userAuth()
+            .then(res => {
+                if(res){
+                    return ({ 
                         user: res.id,
                         name: "",
-                        address: ""
-                    }))
-            }catch(e){}
-        })
+                        address: "" 
+                    })
+                }
+            })
+        )
 }
 
 
@@ -86,6 +87,14 @@ export const getBranchPackages = (type, trace) => {
     api += trace ? `trace=${trace}` : '';
     return axios
         .get(api, tokenConfig())
+        .then(res => res.data)
+        .catch(err => err)
+}
+
+// get branches except the user
+export const getOtherBranchPackages = () => {
+    return axios
+        .get("/api/branch/others", tokenConfig())
         .then(res => res.data)
         .catch(err => err)
 }

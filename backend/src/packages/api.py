@@ -36,10 +36,10 @@ class UserPackageViewSet(viewsets.ModelViewSet):
             _queryset.extend(package_receive)
 
         trace = self.request.query_params.get('trace', None)
-        print("tracking", trace)
+
         if trace:
             _queryset = packages(tracking_number=trace)
-
+        print(_queryset)
         return _queryset
 
     def perform_create(self, serializer):
@@ -51,12 +51,12 @@ class UserPackageSentViewSet(viewsets.ModelViewSet):
     serializer_class = PackageSerializer
 
     def get_queryset(self):
-        queryset = []
+        _queryset = []
         user = self.request.user
         packages = Package.objects.filter
-        queryset.extend(packages(from_branch=user).values())
-        queryset.extend(packages(to_branch=user.branch).values())
-        return queryset
+        _queryset.extend(packages(from_branch=user).values())
+        _queryset.extend(packages(to_branch=user.branch).values())
+        return _queryset
 
     def perform_create(self, serializer):
         serializer.save(from_branch=self.request.user)

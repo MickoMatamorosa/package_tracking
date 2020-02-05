@@ -6,6 +6,7 @@ from packages.models import Package
 from rest_framework.response import Response
 from accounts.serializers import UserSerializer
 from accounts.api import UserAPI
+from django.db.models import Q
 
 # user's branch viewset
 class BranchViewSet(viewsets.ModelViewSet):
@@ -21,7 +22,16 @@ class BranchViewSet(viewsets.ModelViewSet):
         # condition here
         serializer.save()
 
+# other branch viewset
+class OtherBranchViewSet(viewsets.ModelViewSet):
+    serializer_class = BranchSerializer
+    permission_classes = [permissions.IsAuthenticated,]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Branch.objects.filter(~Q(user=user))
+
+# user branch viewset
 class UserBranchViewSet(viewsets.ModelViewSet):
     serializer_class = BranchSerializer
     permission_classes = [permissions.IsAuthenticated,]

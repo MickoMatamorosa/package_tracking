@@ -28,7 +28,7 @@ class App extends Component{
     if(localStorage.getItem('token')){
       userAuth()
         .then(res => {
-          const {username, email} = res
+          const { username, email } = res
           this.setState({username, email})
           auth.login(() => {})
         })
