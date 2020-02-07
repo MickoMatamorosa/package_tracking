@@ -22,7 +22,7 @@ class Branch extends Component {
     componentDidMount(){
         if(localStorage.getItem('token')){
             userAuth()
-                .then(res => auth.user = res.user)
+                .then(res => auth.user = res.id)
                 .catch(err => localStorage.clear())
             
             branchProfile()

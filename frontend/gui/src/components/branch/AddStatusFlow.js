@@ -8,8 +8,9 @@ import Add from '@material-ui/icons/Add';
 import Save from '@material-ui/icons/Save';
 import Close from '@material-ui/icons/Close';
 
-import { useStyles, StyledTableRow, StyledTableCell } from './Styler'
 import { addBranchStatusFlow } from '../../services/branchRequest';
+import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
+import { useStyles } from '../styles/Styler'
 
 export default ({queue, refreshTableData}) => {
     const classes = useStyles();

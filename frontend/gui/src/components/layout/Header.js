@@ -12,7 +12,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import auth from '../../services/auth';
 
-import useStyles from './Header.style';
+import useStyles from '../styles/Header.style';
 
 import HeaderModal from './header-components/Modal';
 import HeaderMenu from './header-components/Menu';

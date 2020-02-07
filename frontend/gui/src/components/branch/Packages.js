@@ -12,11 +12,12 @@ import Paper from '@material-ui/core/Paper';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 
-import { getBranchPackages } from '../../services/branchRequest'
-import { StyledTableRow, StyledTableCell, useStyles } from './Styler'
+import { getBranchPackages} from '../../services/branchRequest';
+import { useStyles } from '../styles/Styler'
+import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 import PackageDetails from './PackageDetails'
 import TablePaginationActions from './PackagePagination';
-import NewPackage from './NewPackage'
+import NewPackage from './NewPackage';
 
 
 export default props => {
@@ -28,37 +29,35 @@ export default props => {
   const [openNew, setOpenNew] = useState(false)
 
   const [pack, setPack] = useState({
-      tracking_number: false,
-      client_fullname: '',
-      client_address: '',
-      from_branch: 0,
-      to_branch: 0,
+    tracking_number: false,
+    client_fullname: '',
+    client_address: '',
+    from_branch: 0,
+    to_branch: 0,
   })
 
   const closeView = () => setPack({
-      tracking_number: false,
-      client_fullname: '',
-      client_address: '',
-      from_branch: 0,
-      to_branch: 0,
+    tracking_number: false,
+    client_fullname: '',
+    client_address: '',
+    from_branch: 0,
+    to_branch: 0,
   });
 
-  const packageStatus = (pack) => {
-        setPack(pack)
-    }
+  const packageStatus = pack => setPack(pack)
 
   const freshData = () => {
     getBranchPackages()
     .then(res => {
-        setData(res)
-        setSearch(props.search)
+      setData(res)
+      setSearch(props.search)
     })
   }
 
   useEffect(() => {
     if(search !== props.search){
-        getBranchPackages(null, props.search)
-        .then(res => setData(res))
+      getBranchPackages(null, props.search)
+      .then(res => setData(res))
     } else freshData()
   }, [props.search])
 
@@ -94,7 +93,7 @@ export default props => {
             <StyledTableCell align="center">Tracking No.</StyledTableCell>
             <StyledTableCell align="center">Client Name</StyledTableCell>
             <StyledTableCell align="center">Client Address</StyledTableCell>
-            <StyledTableCell align="center">Destination</StyledTableCell>
+            <StyledTableCell align="center">Other Branch</StyledTableCell>
             <StyledTableCell align="center">Status</StyledTableCell>
             <StyledTableCell align="center">Datetime</StyledTableCell>
             <StyledTableCell align="center">Actions</StyledTableCell>
@@ -105,13 +104,13 @@ export default props => {
             ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : data
           ).map(row => (
-            <StyledTableRow key={row.id} className={classes.pack}
+            <StyledTableRow key={row.id} hover style={{cursor: 'pointer'}}
               onClick={() => packageStatus(row)}>
               <StyledTableCell align="center">{row.tracking_number}</StyledTableCell>
               <StyledTableCell align="center">{row.client_fullname}</StyledTableCell>
               <StyledTableCell align="center">{row.client_address}</StyledTableCell>
-              <StyledTableCell align="center">{row.to_branch}</StyledTableCell>
-              <StyledTableCell align="center">{String(row.completed)}</StyledTableCell>
+              <StyledTableCell align="center">{row.branch_name}</StyledTableCell>
+              <StyledTableCell align="center">send/receive</StyledTableCell>
               <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
               <StyledTableCell align="center">actions</StyledTableCell>
             </StyledTableRow>

@@ -16,7 +16,8 @@ import Save from '@material-ui/icons/Save';
 import Close from '@material-ui/icons/Close';
 
 import { getBranchStatusFlow, updateStatusFlow, deleteStatusFlow } from '../../services/branchRequest';
-import { useStyles, StyledTableRow, StyledTableCell } from './Styler'
+import { useStyles } from '../styles/Styler'
+import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 
 import AddStatusFlow from './AddStatusFlow'
 

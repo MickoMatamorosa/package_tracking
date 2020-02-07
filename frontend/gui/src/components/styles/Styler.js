@@ -1,26 +1,4 @@
-import { withStyles, makeStyles, fade } from '@material-ui/core/styles';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-
-export const StyledTableCell = withStyles(theme => ({
-    head: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-    },
-    body: {
-        fontSize: 14,
-    },
-}))(TableCell);
-
-
-export const StyledTableRow = withStyles(theme => ({
-    root: {
-        '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.background.default,
-        },
-    },
-}))(TableRow);
-
+import { makeStyles, fade } from '@material-ui/core/styles';
 
 export const useStyles = makeStyles(theme => ({
     table: { minWidth: 800, },
@@ -93,8 +71,5 @@ export const modalStyle = makeStyles(theme => ({
         border: '2px solid #000',
         boxShadow: theme.shadows[5],
         padding: theme.spacing(2, 4, 3),
-    },
-    pack: {
-        cursor: 'pointer'
     },
 }));

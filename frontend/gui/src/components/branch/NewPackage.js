@@ -1,11 +1,11 @@
-import React, { useState, useEffect, Fragment} from 'react';
+import React, { useState, useEffect} from 'react';
 
 import {
-    TextField, Backdrop, Modal, InputLabel,
+    TextField, Backdrop, Modal,
     MenuItem, Select, Button, Grid,
 } from '@material-ui/core';
 
-import { modalStyle } from './Styler';
+import { modalStyle } from '../styles/Styler';
 import { getOtherBranchPackages } from '../../services/branchRequest'
 import { addPackage } from '../../services/packageRequest'
 

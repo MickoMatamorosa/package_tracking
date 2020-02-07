@@ -7,12 +7,19 @@ from rest_framework.response import Response
 from accounts.serializers import UserSerializer
 from accounts.api import UserAPI
 from django.db.models import Q
+from django.contrib.auth.models import User
 
 # user's branch viewset
 class BranchViewSet(viewsets.ModelViewSet):
     serializer_class = BranchSerializer
     permission_classes = [permissions.IsAuthenticated,]
-    queryset = Branch.objects.all()
+    
+    def get_queryset(self):
+        user = self.request.query_params.get('user', None)
+        _queryset = Branch.objects.all()
+        if user:
+            _queryset = _queryset.filter(user=user)
+        return _queryset
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -47,8 +54,15 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
     serializer_class = StatusFlowSerializer
 
     def get_queryset(self):
-        branch = self.request.user.branch
-        return StatusFlow.objects.filter(branch=branch)
+        branch = self.request.query_params.get('branch', None)
+        flow_type = self.request.query_params.get('branch_type', None)
+        if flow_type == 'sending':
+            _queryset = User.objects.get(id=branch).branch
+        elif flow_type == 'receiving':
+            _queryset = Branch.objects.get(id=branch)
+        else:
+            return StatusFlow.objects.filter(branch=self.request.user.branch)
+        return _queryset.statusflow_set.filter(branch_type=flow_type)
 
     def perform_create(self, serializer):
         queue_no = 1

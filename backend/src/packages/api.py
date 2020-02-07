@@ -1,14 +1,20 @@
-from packages.models import Package
+from branches.models import Branch, StatusFlow
+from packages.models import Package, PackageStatus
 from rest_framework import viewsets, permissions, generics, filters
-from .serializers import PackageSerializer
+from .serializers import PackageSerializer, PackageStatusSerializer
 from branches.serializers import StatusFlowSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
 # public package view
 class PackageViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Package.objects.all()
     permission_classes = [permissions.AllowAny,]
     serializer_class = PackageSerializer
+
+    def get_queryset(self):
+        trace = self.request.query_params.get('trace', None)
+        if trace:
+            return Package.objects.filter(tracking_number=trace)
+        return Package.objects.all()
 
 
 # user packages viewset (sending, receiving, sent)
@@ -17,7 +23,9 @@ class UserPackageViewSet(viewsets.ModelViewSet):
     serializer_class = PackageSerializer
     
     def get_queryset(self):
+        _response = []
         _queryset = []
+        
         user = self.request.user
         packages = Package.objects.filter
         package_sent = packages(from_branch=user.id)
@@ -35,28 +43,46 @@ class UserPackageViewSet(viewsets.ModelViewSet):
             _queryset.extend(package_sent)
             _queryset.extend(package_receive)
 
+        # request tracking
         trace = self.request.query_params.get('trace', None)
-
         if trace:
             _queryset = packages(tracking_number=trace)
-        print(_queryset)
-        return _queryset
+
+        # set other branch name
+        for x in _queryset:
+            if user == x.from_branch:
+                x.branch_name = x.to_branch.name
+            else:
+                x.branch_name = x.from_branch.branch.name
+            _response.append(x)
+        return _response
 
     def perform_create(self, serializer):
         serializer.save(from_branch=self.request.user)
 
-# user packages viewset (sending, receiving, sent)
-class UserPackageSentViewSet(viewsets.ModelViewSet):
+
+class PackageStatusViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,]
-    serializer_class = PackageSerializer
+    serializer_class = PackageStatusSerializer
 
     def get_queryset(self):
-        _queryset = []
-        user = self.request.user
-        packages = Package.objects.filter
-        _queryset.extend(packages(from_branch=user).values())
-        _queryset.extend(packages(to_branch=user.branch).values())
-        return _queryset
+        package = self.request.query_params.get('package', None)
+        return PackageStatus.objects.filter(package=package)
 
-    def perform_create(self, serializer):
-        serializer.save(from_branch=self.request.user)
+
+class PackageStatusGuestViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.AllowAny,]
+    serializer_class = PackageStatusSerializer
+
+    def get_queryset(self):
+        package = self.request.query_params.get('package', None)
+        return PackageStatus.objects.filter(package=package)
+
+
+class PackageStatusDetailsViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.AllowAny,]
+    serializer_class = StatusFlowSerializer
+
+    def get_queryset(self):
+        flow = self.request.query_params.get('flow', None)
+        return StatusFlow.objects.filter(id=flow)

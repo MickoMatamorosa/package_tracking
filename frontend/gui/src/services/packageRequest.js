@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { tokenConfig } from './headers';
+import { config, tokenConfig } from './headers';
 import { userAuth } from './authRequest'
 
 // add new package
@@ -7,21 +7,35 @@ export const addPackage = body => {
     return userAuth().then(res => {
         body.from_branch = res.id
         const strBody = JSON.stringify(body);
+        const path = `/api/user/package/`;
         return axios
-            .post(`/api/user/package/`, strBody, tokenConfig())
+            .post(path, strBody, tokenConfig())
             .then(res => res.data)
             .catch(err => err)
     })
 }
 
-// get package status
+// get package status (public)
 export const getPackage = trace => {
-    let api = `/api/user/package?tracking_number=${trace}`;
+    const path = `/api/user/package?tracking_number=${trace}`;
     return axios
-        .get(api, tokenConfig())
+        .get(path, tokenConfig())
         .then(res => res.data)
         .catch(err => err)
 }
+
+
+// get package status flow
+export const getPackageStatus = id => {
+    if(id){
+        const path = `/api/package/status?package=${id}`;
+        return axios
+            .get(path, config())
+            .then(res => res.data)
+            .catch(err => err)
+    }
+}
+
 
 // next package status
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment} from 'react';
 
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
-import useStyles from '../Header.style';
+import useStyles from '../../styles/Header.style';
 
 import Profile from '../../branch/Profile';
 import StatusFlow from '../../branch/StatusFlow';
@@ -22,7 +22,7 @@ export default props => {
             ).catch(err => auth.logout(() => {}))
 
             branchProfile().then(res => {
-                if(!res.name) {
+                if(!res) {
                     props.handleOpen('profile')
                     setFirstLogin(true)
                 }

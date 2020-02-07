@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
 import { branchProfile, saveUserProfile } from '../../services/branchRequest';
-import { Grid } from '@material-ui/core';
 
 export default class Profile extends Component {
     constructor(props){

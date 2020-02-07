@@ -12,6 +12,7 @@ class Package(models.Model):
     client_fullname = models.CharField(max_length=200)
     client_address = models.CharField(max_length=500)
     completed = models.BooleanField(default=False)
+    branch_name = models.CharField(max_length=200, null=True)
 
     tracking_number = models.CharField(
         max_length=50,
@@ -45,3 +46,6 @@ class PackageStatus(models.Model):
     status = models.ForeignKey(StatusFlow, on_delete=models.CASCADE)
     remarks = models.CharField(max_length=50)
     timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-timestamp']
