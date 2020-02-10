@@ -19,6 +19,13 @@ import PackageDetails from './PackageDetails'
 import TablePaginationActions from './PackagePagination';
 import NewPackage from './NewPackage';
 
+const defaultPack = {
+  tracking_number: false,
+  client_fullname: '',
+  client_address: '',
+  from_branch: 0,
+  to_branch: 0,
+}
 
 export default props => {
   const classes = useStyles();
@@ -28,23 +35,11 @@ export default props => {
   const [search, setSearch] = useState("");
   const [openNew, setOpenNew] = useState(false)
 
-  const [pack, setPack] = useState({
-    tracking_number: false,
-    client_fullname: '',
-    client_address: '',
-    from_branch: 0,
-    to_branch: 0,
-  })
+  const [pack, setPack] = useState(defaultPack)
 
-  const closeView = () => setPack({
-    tracking_number: false,
-    client_fullname: '',
-    client_address: '',
-    from_branch: 0,
-    to_branch: 0,
-  });
+  const closeView = () => setPack(defaultPack);
 
-  const packageStatus = pack => setPack(pack)
+  const packageStatus = packData => setPack(packData)
 
   const freshData = () => {
     getBranchPackages()

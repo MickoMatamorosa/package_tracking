@@ -5,18 +5,6 @@ from .serializers import PackageSerializer, PackageStatusSerializer
 from branches.serializers import StatusFlowSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
-# public package view
-class PackageViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [permissions.AllowAny,]
-    serializer_class = PackageSerializer
-
-    def get_queryset(self):
-        trace = self.request.query_params.get('trace', None)
-        if trace:
-            return Package.objects.filter(tracking_number=trace)
-        return Package.objects.all()
-
-
 # user packages viewset (sending, receiving, sent)
 class UserPackageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,]
@@ -70,19 +58,26 @@ class PackageStatusViewSet(viewsets.ModelViewSet):
         return PackageStatus.objects.filter(package=package)
 
 
+# public package status
 class PackageStatusGuestViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.AllowAny,]
     serializer_class = PackageStatusSerializer
 
     def get_queryset(self):
-        package = self.request.query_params.get('package', None)
-        return PackageStatus.objects.filter(package=package)
+        trace = self.request.query_params.get('trace', None)
+        package = Package.objects.get(tracking_number=trace)
+        return package.packagestatus_set.all()
 
 
+# public status view
 class PackageStatusDetailsViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.AllowAny,]
     serializer_class = StatusFlowSerializer
 
     def get_queryset(self):
-        flow = self.request.query_params.get('flow', None)
-        return StatusFlow.objects.filter(id=flow)
+        trace = self.request.query_params.get('trace', None)
+        package = Package.objects.get(tracking_number=trace)
+        return [
+            *package.from_branch.branch.statusflow_set.filter(branch_type="sending"),
+            *package.to_branch.statusflow_set.filter(branch_type="receiving")
+        ]

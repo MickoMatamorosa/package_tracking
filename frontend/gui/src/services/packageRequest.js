@@ -15,9 +15,9 @@ export const addPackage = body => {
     })
 }
 
-// get package status (public)
+// get package status by user (private)
 export const getPackage = trace => {
-    const path = `/api/user/package?tracking_number=${trace}`;
+    const path = `/api/user/package?trace=${trace}`;
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)
@@ -30,7 +30,7 @@ export const getPackageStatus = id => {
     if(id){
         const path = `/api/package/status?package=${id}`;
         return axios
-            .get(path, config())
+            .get(path, tokenConfig())
             .then(res => res.data)
             .catch(err => err)
     }

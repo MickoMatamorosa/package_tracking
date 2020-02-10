@@ -6,6 +6,7 @@ import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
 import TableContainer from '@material-ui/core/TableContainer';
+import Paper from '@material-ui/core/Paper';
 
 import CheckSharpIcon from '@material-ui/icons/CheckSharp';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
@@ -13,67 +14,55 @@ import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import { StyledTableRow, StyledTableCell } from './styles/Table.styles'
 import { modalStyle } from './styles/Styler';
 
-import { getGuestPackage } from '../services/guestRequest'
+import { getGuestPackageStatus, getGuestPackageStatusRemarks } from '../services/guestRequest'
 
 
 function Main(props){
     const classes = modalStyle();
     const [packageStat, setPackageStat] = useState(false);
+    const [statFlow, setStatFlow] = useState(false);
 
     const submitTracking = trace => {
+        if(trace){
+            getGuestPackageStatus(trace)
+            .then(res => setPackageStat(res))
 
-        // const arr1 = [1, 2, 3];
-        // const arr2 = [1, 2];
-
-        // const diff = arr1.filter(a1 => !Boolean(arr2.filter(a2 => a1==a2).length))
-        // console.log("diff", diff)
-
-        getGuestPackage("188645272342500")
-        .then(res => setPackageStat(res))
-    }
-
-    if(packageStat){
-        console.log(packageStat);
-        console.log(packageStat.stats[0]);
-        console.log(packageStat.stats[0].flow);
+            getGuestPackageStatusRemarks(trace)
+            .then(res => setStatFlow(res))
+        }
     }
     
     
 
-    return (
-        <Fragment>
-            <Header {...props} {...{submitTracking}}/>
-            <h1>Boom Fast on deliveries but not the package.</h1>
-            { !packageStat
-            ? "Please view your package status using the tracking number of it."
-            : (<TableContainer>
-            <Table className={classes.table} aria-label="custom pagination table">
-                <TableHead>
-                <StyledTableRow>
-                    <StyledTableCell align="center">Datatime Last Update</StyledTableCell>
-                    <StyledTableCell/>
-                    <StyledTableCell>Transactions Status</StyledTableCell>
-                </StyledTableRow>
-                </TableHead>
-                <TableBody>
-                    <StyledTableRow>
-                        <StyledTableCell align="center">timestamp
-                            {/* { timestamp ? timestamp : "---" } */}
-                        </StyledTableCell>
-                        <StyledTableCell>icon
-                            {/* { timestamp
-                            ? <CheckSharpIcon color="primary"/>
-                            : <LocalShippingIcon color="secondary"/>
-                            }                                     */}
-                        </StyledTableCell>
-                        <StyledTableCell>description</StyledTableCell>
-                    </StyledTableRow>
-                </TableBody>
-            </Table>
-            </TableContainer>)
-            }
-        </Fragment>
-    )
+    return (<Fragment>
+        <Header {...props} {...{submitTracking}}/>
+        {/* <h1>Boom Fast on deliveries but not the package.</h1> */}
+        { !packageStat
+        ? <h2 style={{textIndent: 20}}>Please view your package status using the tracking number of it.</h2>
+        : (<TableContainer component={Paper} style={{width: 800, margin: '50px auto'}}>
+        <Table className={classes.table} aria-label="custom pagination table">
+            <TableHead>
+            <StyledTableRow>
+                <StyledTableCell align="center">Datatime Last Update</StyledTableCell>
+                <StyledTableCell/>
+                <StyledTableCell>Transactions Status</StyledTableCell>
+            </StyledTableRow>
+            </TableHead>
+            <TableBody>
+                {   statFlow && packageStat.map(row => {
+                        const description = statFlow.filter(sf => sf.id === row.status)
+                        return (<StyledTableRow key={row.id}>
+                            <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
+                            <StyledTableCell><CheckSharpIcon color="primary"/></StyledTableCell>
+                            <StyledTableCell>{description[0].description}</StyledTableCell>
+                        </StyledTableRow>)
+                    })
+                }
+            </TableBody>
+        </Table>
+        </TableContainer>)
+        }
+    </Fragment>)
 }
 
 Main.propTypes = {

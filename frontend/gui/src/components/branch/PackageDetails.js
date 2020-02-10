@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
+import IconButton from '@material-ui/core/IconButton';
+import Popover from '@material-ui/core/Popover';
+
+
 import CheckSharpIcon from '@material-ui/icons/CheckSharp';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
-import { modalStyle } from '../styles/Styler';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
+import { modalStyle } from '../styles/Styler';
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 
 import { getBranchStatusFlowByType } from '../../services/branchRequest';
@@ -21,6 +26,7 @@ export default props => {
     const [sendStat, setSendStat] = useState([])
     const [receiveStat, setReceiveStat] = useState([])
     const [userType, setUserType] = useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
 
     useEffect(() => {
         if(props.pack.tracking_number){
@@ -40,8 +46,27 @@ export default props => {
                 .then(res => setPackageStatus(res))
             }
         }
-    }, [props.pack.tracking_number]);  
+    }, [props.pack.tracking_number]);
+
+    const nextStep = () => {
+        
+    }
+
+    const stepBack = () => {
+        
+    }
     
+    const handleClick = event => {
+      setAnchorEl(event.currentTarget);
+    };
+    
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+    
+    const open = Boolean(anchorEl);
+    const id = open ? 'popover-actions' : undefined;
+    const positions = {vertical: 'center', horizontal: 'center',}
 
     return (<Modal
         aria-labelledby="spring-modal-title"
@@ -66,7 +91,7 @@ export default props => {
                 <Table className={classes.table} aria-label="custom pagination table">
                     <TableHead>
                     <StyledTableRow>
-                        <StyledTableCell align="center">Datatime Last Update</StyledTableCell>
+                        <StyledTableCell align="center">Data Last Update</StyledTableCell>
                         <StyledTableCell>Transactions Status</StyledTableCell>
                         <StyledTableCell/>
                         <StyledTableCell/>
@@ -86,18 +111,36 @@ export default props => {
                                 status = packStat[0].remarks === "done"
                             }
 
-                            return (<StyledTableRow key={stat.id} hover>
+                            return (<StyledTableRow key={stat.id}>
                                 <StyledTableCell align="center">
                                     { timestamp ? timestamp : "---" }
                                 </StyledTableCell>
                                 <StyledTableCell>{stat.description}</StyledTableCell>
                                 <StyledTableCell>
-                                    { timestamp
+                                { timestamp
+                                  ? stat.remarks === "ongoing"
                                     ? <CheckSharpIcon color="primary"/>
-                                    : <LocalShippingIcon color="secondary"/>
-                                    }                                    
+                                    : <IconButton
+                                        aria-describedby={id}
+                                        onClick={handleClick}>
+                                        <LocalShippingIcon color="primary"/>
+                                      </IconButton>
+                                  : "---"
+                                }
                                 </StyledTableCell>
-                                <StyledTableCell/>
+                                <Popover id={id}
+                                    open={open}
+                                    anchorEl={anchorEl}
+                                    onClose={handleClose}
+                                    anchorOrigin={positions}
+                                    transformOrigin={positions}>
+                                    <IconButton onClick={nextStep}>
+                                        <CheckSharpIcon color="primary"/>
+                                    </IconButton>
+                                    <IconButton onClick={stepBack}>
+                                        <ArrowBackIcon color="secondary"/>
+                                    </IconButton>
+                                </Popover>
                             </StyledTableRow>)
                         })
                     }</TableBody>
