@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -9,7 +9,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
 import Tooltip from '@material-ui/core/Tooltip';
 
-
 import CheckSharpIcon from '@material-ui/icons/CheckSharp';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -18,8 +17,9 @@ import { modalStyle } from '../styles/Styler';
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 
 import { getBranchStatusFlowByType } from '../../services/branchRequest';
-import { getPackageStatus, doneStatus } from '../../services/packageRequest';
+import { getPackageStatus, doneStatus, previousStatus } from '../../services/packageRequest';
 import auth from '../../services/auth';
+
 
 export default props => {
     const classes = modalStyle();
@@ -44,10 +44,17 @@ export default props => {
             .then(res => setPackageStatus(res))
         }
     }
+    
+    const handleClose = () => {
+        setAnchorEl(null);
+        props.freshData();
+    };
 
     useEffect(() => {
+        if(props.confirmDelete || props.editMode) props.closeView()
+
         if(props.pack.tracking_number){
-            const { from_branch, to_branch } = props.pack
+            const { from_branch } = props.pack
             
             if(auth.user===from_branch) setUserType("sending")
             else setUserType("receiving")
@@ -57,25 +64,20 @@ export default props => {
     }, [props.pack.tracking_number]);
 
     const done = () => {
-        console.log("Done", props.pack.id, activeStat);
-
-        doneStatus(props.pack.id, activeStat)
-        .then(res => getPackageStatusFlow())
+        doneStatus(props.pack.id, activeStat);
+        getPackageStatusFlow();
         setAnchorEl(null);
     }
 
     const undo = () => {
+        previousStatus(props.pack.id, activeStat);
+        getPackageStatusFlow();
         setAnchorEl(null);
-        console.log("Undo");
     }
     
     const handleClick = (event, stat) => {
         setAnchorEl(event.currentTarget);
         setActiveStat(stat)
-    };
-    
-    const handleClose = () => {
-        setAnchorEl(null);
     };
     
     const open = Boolean(anchorEl);

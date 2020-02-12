@@ -4,6 +4,9 @@ from rest_framework import viewsets, permissions, generics, filters
 from .serializers import PackageSerializer, PackageStatusSerializer
 from branches.serializers import StatusFlowSerializer
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status,viewsets
+from rest_framework.response import Response
+from django.http import Http404
 
 # user packages viewset (sending, receiving, sent)
 class UserPackageViewSet(viewsets.ModelViewSet):
@@ -43,7 +46,11 @@ class UserPackageViewSet(viewsets.ModelViewSet):
             else:
                 x.branch_name = x.from_branch.branch.name
             _response.append(x)
-        return _response
+
+        if _response:
+            return _response
+        else:
+            return Package.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(from_branch=self.request.user)
@@ -63,6 +70,13 @@ class PackageStatusViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         # tocode: auto create next status (signal)
         serializer.save()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.status.queue > 1:
+            self.perform_destroy(instance)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 # public package status

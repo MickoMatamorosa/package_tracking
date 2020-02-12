@@ -10,14 +10,18 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Fab from '@material-ui/core/Fab';
+import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 
 import { getBranchPackages} from '../../services/branchRequest';
+import { cancelPackage} from '../../services/packageRequest';
 import { useStyles } from '../styles/Styler'
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 import PackageDetails from './PackageDetails'
 import TablePaginationActions from './PackagePagination';
 import NewPackage from './NewPackage';
+import ConfirmAction from '../common/ConfirmAction';
+import auth from '../../services/auth';
 
 const defaultPack = {
   tracking_number: false,
@@ -34,8 +38,8 @@ export default props => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [openNew, setOpenNew] = useState(false)
-
   const [pack, setPack] = useState(defaultPack)
+  const [confirmDelete, setConfirmDelete] = useState(null)
 
   const closeView = () => setPack(defaultPack);
 
@@ -44,6 +48,8 @@ export default props => {
   const freshData = () => {
     getBranchPackages()
     .then(res => {
+      console.log(res);
+      
       setData(res)
       setSearch(props.search)
     })
@@ -65,19 +71,28 @@ export default props => {
   const handleChangeRowsPerPage = event => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };  
+  };
+
+  const deleteFn = () => {
+    console.log("actions fn", confirmDelete);
+    setConfirmDelete(null)
+    cancelPackage(confirmDelete)
+  }
 
   return (<Fragment>
-    <PackageDetails {...{pack, closeView}}/>
+    <PackageDetails {...{pack, closeView, freshData, confirmDelete}}/>
     <NewPackage {...{openNew, setOpenNew, freshData}}/>
+    <ConfirmAction {...{
+      confirmDelete, setConfirmDelete,
+      deleteFn, text: "cancel this package"
+    }}/>
     <div className={classes.addWrapper}>
       <Fab size="medium"
         color="primary"
         aria-label="add"
         variant="extended"
         className={classes.fab}
-        onClick={() => setOpenNew(true)}
-        >
+        onClick={() => setOpenNew(true)}>
         <AddIcon />New Package
       </Fab>
     </div>
@@ -91,9 +106,10 @@ export default props => {
             <StyledTableCell align="center">Other Branch</StyledTableCell>
             <StyledTableCell align="center">Status</StyledTableCell>
             <StyledTableCell align="center">Datetime</StyledTableCell>
-            <StyledTableCell align="center">Actions</StyledTableCell>
+            <StyledTableCell/>
           </StyledTableRow>
         </TableHead>
+
         <TableBody>
           { data && (rowsPerPage > 0
             ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -101,26 +117,39 @@ export default props => {
           ).map(row => (
             <StyledTableRow key={row.id} hover style={{cursor: 'pointer'}}
               onClick={() => packageStatus(row)}>
-              <StyledTableCell align="center">{row.tracking_number}</StyledTableCell>
-              <StyledTableCell align="center">{row.client_fullname}</StyledTableCell>
-              <StyledTableCell align="center">{row.client_address}</StyledTableCell>
-              <StyledTableCell align="center">{row.branch_name}</StyledTableCell>
-              <StyledTableCell align="center">send/receive</StyledTableCell>
+              <StyledTableCell>{row.tracking_number}</StyledTableCell>
+              <StyledTableCell>{row.client_fullname}</StyledTableCell>
+              <StyledTableCell>{row.client_address}</StyledTableCell>
+              <StyledTableCell>{row.branch_name}</StyledTableCell>
+              <StyledTableCell align="center">
+                { row.completed
+                  ? "completed"
+                  : auth.user === row.from_branch
+                    ? "sending"
+                    : "receiving"
+                }
+              </StyledTableCell>
               <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
-              <StyledTableCell align="center">actions</StyledTableCell>
+              <StyledTableCell align="center">
+                { !row.completed && auth.user === row.from_branch && 
+                  <Button size="small" onClick={() => setConfirmDelete(row.id)}>
+                    cancel</Button>
+                }
+              </StyledTableCell>
             </StyledTableRow>
           ))}
-          {emptyRows > 0 && (
+          { emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
               <TableCell colSpan={6} />
             </TableRow>
           )}
         </TableBody>
+
         <TableFooter>
           <TableRow>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
               colSpan={7}
+              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
               count={data.length}
               rowsPerPage={rowsPerPage}
               page={page}

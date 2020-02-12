@@ -23,10 +23,10 @@ import AddStatusFlow from './AddStatusFlow'
 
 const TblActions = ({row, handleDelete, setEditMode}) => {
     return (<Fragment>
-        <IconButton onClick={ () => setEditMode(row) }>
-            <Edit /></IconButton>
-        <IconButton onClick={ () => handleDelete(row.id) }>
-            <Delete /></IconButton>
+        <IconButton onClick={() => setEditMode(row)}>
+            <Edit color="primary"/></IconButton>
+        <IconButton onClick={() => handleDelete(row.id)}>
+            <Delete color="secondary" /></IconButton>
     </Fragment>)
 }
 

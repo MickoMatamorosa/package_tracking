@@ -12,7 +12,8 @@ class Package(models.Model):
     client_fullname = models.CharField(max_length=200)
     client_address = models.CharField(max_length=500)
     completed = models.BooleanField(default=False)
-    branch_name = models.CharField(max_length=200, null=True)
+    cancel = models.BooleanField(default=False)
+    branch_name = models.CharField(max_length=200, null=True, blank=True)
 
     tracking_number = models.CharField(
         max_length=50,

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { tokenConfig } from './headers';
 import {userAuth} from './authRequest'
-import auth from './auth'
 
 // branch profile
 export const branchProfile = () => {
@@ -10,23 +9,17 @@ export const branchProfile = () => {
         .get("/api/auth/branch", tokenConfig())
         .then(res => res.data[0])
         .catch(err => userAuth()
-            .then(res => {
-                if(res){
-                    return ({ 
-                        user: res.id,
-                        name: "",
-                        address: "" 
-                    })
-                }
-            })
+            .then(res => res && ({ 
+                user: res.id, 
+                name: "", 
+                address: ""
+            }))
         )
 }
 
 
 // get receiving branch profile (UNUSED)
 export const getReceiverBranch = id => {
-    console.log("r", id);
-    
     return axios
         .get(`/api/branch/others/${id}`, tokenConfig())
         .then(res => res.data.name)
