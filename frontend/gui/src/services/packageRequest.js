@@ -15,7 +15,7 @@ export const addPackage = body => {
     })
 }
 
-// get package status by user (private)
+// get package status by user
 export const getPackage = trace => {
     const path = `/api/user/package?trace=${trace}`;
     return axios
@@ -38,6 +38,16 @@ export const getPackageStatus = id => {
 
 
 // next package status
+export const doneStatus = (pack_id, stat_id, queue, branch_type) => {
+    const body = JSON.stringify({remarks: 'done'});
+    const path = `/api/package/status/${stat_id}/?package=${pack_id}`;
+    
+    // update current status to done
+    axios.patch(path, body, tokenConfig())
+        .then(res => res.data)
+        .catch(err => err)
 
+    return getPackageStatus(pack_id)
+}
 
 // back to previous status

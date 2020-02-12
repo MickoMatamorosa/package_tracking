@@ -57,6 +57,13 @@ class PackageStatusViewSet(viewsets.ModelViewSet):
         package = self.request.query_params.get('package', None)
         return PackageStatus.objects.filter(package=package)
 
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def perform_update(self, serializer):
+        # tocode: auto create next status (signal)
+        serializer.save()
+
 
 # public package status
 class PackageStatusGuestViewSet(viewsets.ReadOnlyModelViewSet):

@@ -7,6 +7,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
 import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
+import Tooltip from '@material-ui/core/Tooltip';
 
 
 import CheckSharpIcon from '@material-ui/icons/CheckSharp';
@@ -17,7 +18,7 @@ import { modalStyle } from '../styles/Styler';
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 
 import { getBranchStatusFlowByType } from '../../services/branchRequest';
-import { getPackageStatus } from '../../services/packageRequest';
+import { getPackageStatus, doneStatus } from '../../services/packageRequest';
 import auth from '../../services/auth';
 
 export default props => {
@@ -27,41 +28,54 @@ export default props => {
     const [receiveStat, setReceiveStat] = useState([])
     const [userType, setUserType] = useState('');
     const [anchorEl, setAnchorEl] = useState(null);
+    const [activeStat, setActiveStat] = useState(null);
+
+    const getPackageStatusFlow = () => {
+        const { from_branch, to_branch } = props.pack
+
+        getBranchStatusFlowByType(from_branch, "sending")
+        .then(res => setSendStat(res))
+
+        getBranchStatusFlowByType(to_branch, "receiving")
+        .then(res => setReceiveStat(res))
+
+        if(props.pack.id){
+            getPackageStatus(props.pack.id)
+            .then(res => setPackageStatus(res))
+        }
+    }
 
     useEffect(() => {
         if(props.pack.tracking_number){
             const { from_branch, to_branch } = props.pack
-
+            
             if(auth.user===from_branch) setUserType("sending")
-            if(auth.user===to_branch) setUserType("receiving")
+            else setUserType("receiving")
 
-            getBranchStatusFlowByType(from_branch, "sending")
-            .then(res => setSendStat(res))
-
-            getBranchStatusFlowByType(to_branch, "receiving")
-            .then(res => setReceiveStat(res))
-
-            if(props.pack.id){
-                getPackageStatus(props.pack.id)
-                .then(res => setPackageStatus(res))
-            }
+            getPackageStatusFlow()
         }
     }, [props.pack.tracking_number]);
 
-    const nextStep = () => {
-        
+    const done = () => {
+        console.log("Done", props.pack.id, activeStat);
+
+        doneStatus(props.pack.id, activeStat)
+        .then(res => getPackageStatusFlow())
+        setAnchorEl(null);
     }
 
-    const stepBack = () => {
-        
+    const undo = () => {
+        setAnchorEl(null);
+        console.log("Undo");
     }
     
-    const handleClick = event => {
-      setAnchorEl(event.currentTarget);
+    const handleClick = (event, stat) => {
+        setAnchorEl(event.currentTarget);
+        setActiveStat(stat)
     };
     
     const handleClose = () => {
-      setAnchorEl(null);
+        setAnchorEl(null);
     };
     
     const open = Boolean(anchorEl);
@@ -94,7 +108,6 @@ export default props => {
                         <StyledTableCell align="center">Data Last Update</StyledTableCell>
                         <StyledTableCell>Transactions Status</StyledTableCell>
                         <StyledTableCell/>
-                        <StyledTableCell/>
                     </StyledTableRow>
                     </TableHead>
                     <TableBody>{
@@ -104,7 +117,8 @@ export default props => {
                             
                             const packStat = packageStatus.filter(pack => 
                                 pack.package === props.pack.id &&
-                                pack.status === stat.id);                            
+                                pack.status === stat.id);
+                            
 
                             if(Boolean(packStat.length)){
                                 timestamp = packStat[0].timestamp
@@ -116,15 +130,16 @@ export default props => {
                                     { timestamp ? timestamp : "---" }
                                 </StyledTableCell>
                                 <StyledTableCell>{stat.description}</StyledTableCell>
-                                <StyledTableCell>
+                                <StyledTableCell align="center">
                                 { timestamp
-                                  ? stat.remarks === "ongoing"
+                                  ? packStat[0].remarks === "done"
                                     ? <CheckSharpIcon color="primary"/>
-                                    : <IconButton
-                                        aria-describedby={id}
-                                        onClick={handleClick}>
-                                        <LocalShippingIcon color="primary"/>
-                                      </IconButton>
+                                    : userType !== stat.branch_type
+                                      ? <LocalShippingIcon color="primary"/>
+                                      : <IconButton aria-describedby={id}
+                                          onClick={e => handleClick(e, packStat[0].id)}>
+                                          <LocalShippingIcon color="primary"/>
+                                        </IconButton>
                                   : "---"
                                 }
                                 </StyledTableCell>
@@ -134,12 +149,16 @@ export default props => {
                                     onClose={handleClose}
                                     anchorOrigin={positions}
                                     transformOrigin={positions}>
-                                    <IconButton onClick={nextStep}>
+                                    <Tooltip title="Done" placement="top-start">
+                                      <IconButton onClick={done}>
                                         <CheckSharpIcon color="primary"/>
-                                    </IconButton>
-                                    <IconButton onClick={stepBack}>
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Undo" placement="top-start">
+                                      <IconButton onClick={undo}>
                                         <ArrowBackIcon color="secondary"/>
-                                    </IconButton>
+                                      </IconButton>
+                                    </Tooltip>
                                 </Popover>
                             </StyledTableRow>)
                         })

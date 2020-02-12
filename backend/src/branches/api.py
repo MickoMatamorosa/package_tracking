@@ -25,8 +25,7 @@ class BranchViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
-        # check user id and branch user id
-        # condition here
+        # tocode: check user id and branch user id
         serializer.save()
 
 # other branch viewset

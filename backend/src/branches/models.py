@@ -23,3 +23,6 @@ class StatusFlow(models.Model):
 
     class Meta:
         ordering = ['branch_type', '-queue']
+
+    def __str__(self):
+        return '%s - %s Q#%d' % (self.branch, self.branch_type, self.queue)

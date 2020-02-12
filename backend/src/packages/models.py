@@ -44,7 +44,7 @@ class Package(models.Model):
 class PackageStatus(models.Model):
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     status = models.ForeignKey(StatusFlow, on_delete=models.CASCADE)
-    remarks = models.CharField(max_length=50)
+    remarks = models.CharField(max_length=50, default="ongoing")
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:

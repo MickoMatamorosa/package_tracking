@@ -30,7 +30,7 @@ const defaultPack = {
 export default props => {
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [openNew, setOpenNew] = useState(false)
@@ -65,7 +65,7 @@ export default props => {
   const handleChangeRowsPerPage = event => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
+  };  
 
   return (<Fragment>
     <PackageDetails {...{pack, closeView}}/>
@@ -95,7 +95,7 @@ export default props => {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {(rowsPerPage > 0
+          { data && (rowsPerPage > 0
             ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : data
           ).map(row => (
