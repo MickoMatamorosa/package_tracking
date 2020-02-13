@@ -33,22 +33,16 @@ class Branch extends Component {
         }
     }
 
-    submitTracking = (search) => {
-        console.log("submit search", search);
-        
-        this.setState({search})
-    }
+    submitTracking = (search) => this.setState({search})
     
     render() {        
         const {submitTracking, props, state} = this
         return (
             <Fragment>
                 <Header {...props}
-                    {...{submitTracking}}
-                />
+                    {...{submitTracking}}/>
                 <Packages {...props}
-                    search={state.search}
-                />
+                    search={state.search}/>
             </Fragment>
         )
     }

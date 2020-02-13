@@ -23,16 +23,19 @@ function Main(props){
     const [statFlow, setStatFlow] = useState(false);
 
     const submitTracking = trace => {
+        setStatFlow(false)
+        setPackageStat(false)
         if(trace){
-            getGuestPackageStatus(trace)
-            .then(res => setPackageStat(res))
-
             getGuestPackageStatusRemarks(trace)
-            .then(res => setStatFlow(res))
+            .then(res => {
+                getGuestPackageStatus(trace)
+                .then(result => {
+                    setStatFlow(res);
+                    setPackageStat(result);
+                })
+            })
         }
     }
-    
-    
 
     return (<Fragment>
         <Header {...props} {...{submitTracking}}/>
@@ -49,7 +52,7 @@ function Main(props){
             </StyledTableRow>
             </TableHead>
             <TableBody>
-                {   statFlow && packageStat.map(row => {
+                {   statFlow && packageStat && packageStat.map(row => {
                         const description = statFlow.filter(sf => sf.id === row.status)
                         return (<StyledTableRow key={row.id}>
                             <StyledTableCell align="center">{row.timestamp}</StyledTableCell>

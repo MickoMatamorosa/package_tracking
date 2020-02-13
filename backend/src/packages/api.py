@@ -22,18 +22,22 @@ class UserPackageViewSet(viewsets.ModelViewSet):
         package_sent = packages(from_branch=user.id)
         package_receive = packages(to_branch=user.branch)
         package_type = self.request.query_params.get('type', None)
+
         if package_type == 'sending':
             _queryset.extend(package_sent)
+
         elif package_type == 'receiving':
             _queryset.extend(package_receive)
+
         elif package_type == 'completed':
             completed_packages = Package.objects.filter(completed=True).filter
             _queryset.extend(completed_packages(from_branch=user.id))
             _queryset.extend(completed_packages(to_branch=user.branch))
+
         else:
             _queryset.extend(package_sent)
             _queryset.extend(package_receive)
-
+        
         # request tracking
         trace = self.request.query_params.get('trace', None)
         if trace:
@@ -49,11 +53,15 @@ class UserPackageViewSet(viewsets.ModelViewSet):
 
         if _response:
             return _response
-        else:
-            return Package.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(from_branch=self.request.user)
+
+
+class PackageViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated,]
+    serializer_class = PackageSerializer
+    queryset = Package.objects.all()
 
 
 class PackageStatusViewSet(viewsets.ModelViewSet):
@@ -63,13 +71,6 @@ class PackageStatusViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         package = self.request.query_params.get('package', None)
         return PackageStatus.objects.filter(package=package)
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-    def perform_update(self, serializer):
-        # tocode: auto create next status (signal)
-        serializer.save()
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

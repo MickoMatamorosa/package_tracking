@@ -58,8 +58,6 @@ export default class Profile extends Component {
             }
         }
         
-        console.log(Boolean(value));
-
         this.setState(({shrink}) => ({
             [name]: value,
             shrink: {
@@ -88,6 +86,7 @@ export default class Profile extends Component {
         saveUserProfile({ name, address })
         .then(res => {
             this.props.setFirstLogin(false);
+            this.props.setHasProfile(true)
             this.props.handleClose();
         })
     }

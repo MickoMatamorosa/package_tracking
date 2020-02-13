@@ -69,7 +69,7 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
         last_queue = StatusFlow.objects.filter(
             branch=self.request.user.branch,
             branch_type=stype
-        ).last()
+        ).first()
         
         if last_queue:
             queue_no += last_queue.queue

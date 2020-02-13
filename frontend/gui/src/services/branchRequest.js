@@ -23,7 +23,6 @@ export const getReceiverBranch = id => {
     return axios
         .get(`/api/branch/others/${id}`, tokenConfig())
         .then(res => res.data.name)
-        .catch(err => console.log(err))
 }
 
 
@@ -35,7 +34,6 @@ export const getSenderBranch = id => {
     return axios
         .get(path, tokenConfig())
         .then(res => res.data[0].name)
-        .catch(err => console.log(err))
 }
 
 
@@ -118,7 +116,6 @@ export const getBranchPackages = (type, trace) => {
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)
-        .catch(err => err)
 }
 
 
@@ -128,5 +125,4 @@ export const getOtherBranchPackages = () => {
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)
-        .catch(err => err)
 }

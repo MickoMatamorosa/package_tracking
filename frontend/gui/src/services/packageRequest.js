@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { config, tokenConfig } from './headers';
+import { tokenConfig } from './headers';
 import { userAuth } from './authRequest'
 
 // add new package
@@ -11,18 +11,16 @@ export const addPackage = body => {
         return axios
             .post(path, strBody, tokenConfig())
             .then(res => res.data)
-            .catch(err => err)
     })
 }
 
 
 export const cancelPackage = id => {
     const body = JSON.stringify({cancel: true});
-    const path = `/api/user/package/${id}/`;
+    const path = `/api/package/${id}/`;
     return axios
         .patch(path, body, tokenConfig())
         .then(res => res.data)
-        .catch(err => err)
 }
 
 
@@ -32,7 +30,6 @@ export const getPackage = trace => {
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)
-        .catch(err => err)
 }
 
 
@@ -43,7 +40,6 @@ export const getPackageStatus = id => {
         return axios
             .get(path, tokenConfig())
             .then(res => res.data)
-            .catch(err => err);
     }
 }
 
@@ -54,14 +50,16 @@ export const doneStatus = (pack_id, stat_id) => {
     const path = `/api/package/status/${stat_id}/?package=${pack_id}`;
     
     // update current status to done
-    axios.patch(path, body, tokenConfig())
-        .catch(err => err);
+    return axios.patch(path, body, tokenConfig())
+        .then(res => res.data)
 }
+
 
 // back to previous status
 export const previousStatus = (pack_id, stat_id) => {
     const path = `/api/package/status/${stat_id}/?package=${pack_id}`;
 
-    axios.delete(path, tokenConfig())
-        .catch(err => err);
+    return axios.delete(path, tokenConfig())
+        .then(res => res.data)
+        .catch(err => err)
 }

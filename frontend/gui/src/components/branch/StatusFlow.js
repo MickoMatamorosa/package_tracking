@@ -20,17 +20,18 @@ import { useStyles } from '../styles/Styler'
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 
 import AddStatusFlow from './AddStatusFlow'
+import ConfirmAction from '../common/ConfirmAction';
 
-const TblActions = ({row, handleDelete, setEditMode}) => {
+const TblActions = ({row, setActive, setEditMode}) => {
     return (<Fragment>
         <IconButton onClick={() => setEditMode(row)}>
             <Edit color="primary"/></IconButton>
-        <IconButton onClick={() => handleDelete(row.id)}>
+        <IconButton onClick={() => setActive(row.id)}>
             <Delete color="secondary" /></IconButton>
     </Fragment>)
 }
 
-export default () => {
+export default (props) => {
     const classes = useStyles();
     const [tableData, setTableData] = useState([]);
     const [queue, setQueue] = useState({
@@ -38,6 +39,7 @@ export default () => {
     })
     const [editMode, setEditMode] = useState(null)
     const [error, setError] = useState(false)
+    const [active, setActive] = useState(null)
 
     const statusFlow = () => {        
         getBranchStatusFlow()
@@ -61,18 +63,21 @@ export default () => {
     const handleSave = () => {
         if(editMode.description){
             updateStatusFlow(editMode)
-            .then(res => {
+            .then(() => {
                 setEditMode(null)
                 statusFlow()
+                props.setFirstLogin(false)
             })
             .catch(err => console.log(err, "update failed!"))
         }else setError(true)
     }
 
-    const handleDelete = id => {
-        deleteStatusFlow(id)
-            .then(res => statusFlow())
-            .catch(err => console.log(err))
+    const handleDelete = () => {
+        deleteStatusFlow(active)
+        .then(() => {
+            statusFlow();
+            setActive(null);
+        })
     }
 
     const handleChange = e => {
@@ -80,7 +85,12 @@ export default () => {
         setEditMode({...editMode, [name]: value});
     }
 
-    return (
+    return (<Fragment>
+        <ConfirmAction {...{
+            active, setActive,
+            text: "delete",
+            actionFn: handleDelete
+        }}/>
         <TableContainer component={Paper}>
         <Table className={classes.table} size='small' aria-label="customized table">
             <TableHead>
@@ -145,9 +155,9 @@ export default () => {
                 </StyledTableCell>
                 <StyledTableCell className={classes.actions} align="center">
                     { !editMode
-                    ? <TblActions {...{row, handleSave, setEditMode}} />
+                    ? <TblActions {...{row, setActive, setEditMode}} />
                     : editMode.id !== row.id
-                      ? <TblActions {...{row, handleSave, setEditMode}} />
+                      ? <TblActions {...{row, setActive, setEditMode}} />
                       : <Fragment>
                             <IconButton onClick={ () => handleSave(row) }>
                                 <Save /></IconButton>
@@ -166,5 +176,5 @@ export default () => {
             </TableBody>
         </Table>
         </TableContainer>
-    );
+    </Fragment>);
 }

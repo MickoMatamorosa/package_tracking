@@ -39,7 +39,7 @@ export default props => {
   const [search, setSearch] = useState("");
   const [openNew, setOpenNew] = useState(false)
   const [pack, setPack] = useState(defaultPack)
-  const [confirmDelete, setConfirmDelete] = useState(null)
+  const [active, setActive] = useState(null)
 
   const closeView = () => setPack(defaultPack);
 
@@ -48,11 +48,14 @@ export default props => {
   const freshData = () => {
     getBranchPackages()
     .then(res => {
-      console.log(res);
+      console.log(res, typeof res);
       
-      setData(res)
-      setSearch(props.search)
+      if(typeof res === "object"){
+        setData(res)
+        setSearch(props.search)
+      }
     })
+    .catch(err => console.log("ERROR", err))
   }
 
   useEffect(() => {
@@ -73,19 +76,21 @@ export default props => {
     setPage(0);
   };
 
-  const deleteFn = () => {
-    console.log("actions fn", confirmDelete);
-    setConfirmDelete(null)
-    cancelPackage(confirmDelete)
-  }
+  const actionFn = () => {
+    console.log("actions fn", active);
+    setActive(null);
+    cancelPackage(active)
+    .then(() => freshData());
+  }  
 
   return (<Fragment>
-    <PackageDetails {...{pack, closeView, freshData, confirmDelete}}/>
+    <PackageDetails {...{pack, closeView, freshData, active}}/>
     <NewPackage {...{openNew, setOpenNew, freshData}}/>
     <ConfirmAction {...{
-      confirmDelete, setConfirmDelete,
-      deleteFn, text: "cancel this package"
+      active, setActive,
+      actionFn, text: "cancel this package"
     }}/>
+
     <div className={classes.addWrapper}>
       <Fab size="medium"
         color="primary"
@@ -96,6 +101,7 @@ export default props => {
         <AddIcon />New Package
       </Fab>
     </div>
+
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="custom pagination table">
         <TableHead>
@@ -114,30 +120,35 @@ export default props => {
           { data && (rowsPerPage > 0
             ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : data
-          ).map(row => (
-            <StyledTableRow key={row.id} hover style={{cursor: 'pointer'}}
-              onClick={() => packageStatus(row)}>
-              <StyledTableCell>{row.tracking_number}</StyledTableCell>
-              <StyledTableCell>{row.client_fullname}</StyledTableCell>
-              <StyledTableCell>{row.client_address}</StyledTableCell>
-              <StyledTableCell>{row.branch_name}</StyledTableCell>
-              <StyledTableCell align="center">
-                { row.completed
-                  ? "completed"
-                  : auth.user === row.from_branch
-                    ? "sending"
-                    : "receiving"
-                }
-              </StyledTableCell>
-              <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
-              <StyledTableCell align="center">
-                { !row.completed && auth.user === row.from_branch && 
-                  <Button size="small" onClick={() => setConfirmDelete(row.id)}>
-                    cancel</Button>
-                }
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
+            ).map(row => (
+              <StyledTableRow key={row.id} hover style={{cursor: 'pointer'}}
+                onClick={() => packageStatus(row)}>
+                <StyledTableCell>{row.tracking_number}</StyledTableCell>
+                <StyledTableCell>{row.client_fullname}</StyledTableCell>
+                <StyledTableCell>{row.client_address}</StyledTableCell>
+                <StyledTableCell>{row.branch_name}</StyledTableCell>
+                <StyledTableCell align="center">
+                  { row.completed
+                    ? "completed"
+                    : row.cancel
+                      ? "cancelled"
+                      : auth.user === row.from_branch
+                        ? "sending"
+                        : "receiving"
+                  }
+                </StyledTableCell>
+                <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
+                <StyledTableCell align="center">
+                  { !row.completed && auth.user === row.from_branch && (
+                    row.cancel
+                    ? "cancelled"
+                    : <Button size="small" onClick={() => setActive(row.id)}>
+                        cancel</Button>
+                  )}
+                </StyledTableCell>
+              </StyledTableRow>
+            ))
+          }
           { emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
               <TableCell colSpan={6} />

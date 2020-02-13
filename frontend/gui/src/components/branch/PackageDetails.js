@@ -51,7 +51,7 @@ export default props => {
     };
 
     useEffect(() => {
-        if(props.confirmDelete || props.editMode) props.closeView()
+        if(props.active || props.editMode) props.closeView()
 
         if(props.pack.tracking_number){
             const { from_branch } = props.pack
@@ -64,20 +64,25 @@ export default props => {
     }, [props.pack.tracking_number]);
 
     const done = () => {
-        doneStatus(props.pack.id, activeStat);
-        getPackageStatusFlow();
-        setAnchorEl(null);
+        doneStatus(props.pack.id, activeStat)
+        .then(res => {
+            getPackageStatusFlow();
+            setAnchorEl(null);
+            props.freshData();
+        });
     }
 
     const undo = () => {
-        previousStatus(props.pack.id, activeStat);
-        getPackageStatusFlow();
-        setAnchorEl(null);
+        previousStatus(props.pack.id, activeStat)
+        .then(res => {
+            getPackageStatusFlow();
+            setAnchorEl(null);
+        });
     }
     
     const handleClick = (event, stat) => {
         setAnchorEl(event.currentTarget);
-        setActiveStat(stat)
+        setActiveStat(stat);
     };
     
     const open = Boolean(anchorEl);
@@ -145,27 +150,27 @@ export default props => {
                                   : "---"
                                 }
                                 </StyledTableCell>
-                                <Popover id={id}
-                                    open={open}
-                                    anchorEl={anchorEl}
-                                    onClose={handleClose}
-                                    anchorOrigin={positions}
-                                    transformOrigin={positions}>
-                                    <Tooltip title="Done" placement="top-start">
-                                      <IconButton onClick={done}>
-                                        <CheckSharpIcon color="primary"/>
-                                      </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Undo" placement="top-start">
-                                      <IconButton onClick={undo}>
-                                        <ArrowBackIcon color="secondary"/>
-                                      </IconButton>
-                                    </Tooltip>
-                                </Popover>
                             </StyledTableRow>)
                         })
                     }</TableBody>
                 </Table>
+                <Popover id={id}
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handleClose}
+                    anchorOrigin={positions}
+                    transformOrigin={positions}>
+                    <Tooltip title="Done" placement="top-start">
+                        <IconButton onClick={done}>
+                        <CheckSharpIcon color="primary"/>
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Undo" placement="top-start">
+                        <IconButton onClick={undo}>
+                        <ArrowBackIcon color="secondary"/>
+                        </IconButton>
+                    </Tooltip>
+                </Popover>
             </div>
         </div>
     </Modal>)
