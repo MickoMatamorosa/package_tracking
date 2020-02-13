@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
 import { branchProfile, saveUserProfile } from '../../services/branchRequest';
-import { Grid } from '@material-ui/core';
 
 export default class Profile extends Component {
     constructor(props){
@@ -58,8 +58,6 @@ export default class Profile extends Component {
             }
         }
         
-        console.log(Boolean(value));
-
         this.setState(({shrink}) => ({
             [name]: value,
             shrink: {
@@ -88,6 +86,7 @@ export default class Profile extends Component {
         saveUserProfile({ name, address })
         .then(res => {
             this.props.setFirstLogin(false);
+            this.props.setHasProfile(true)
             this.props.handleClose();
         })
     }

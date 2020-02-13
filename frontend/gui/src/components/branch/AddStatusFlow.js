@@ -8,8 +8,9 @@ import Add from '@material-ui/icons/Add';
 import Save from '@material-ui/icons/Save';
 import Close from '@material-ui/icons/Close';
 
-import { useStyles, StyledTableRow, StyledTableCell } from './Styler'
 import { addBranchStatusFlow } from '../../services/branchRequest';
+import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
+import { useStyles } from '../styles/Styler'
 
 export default ({queue, refreshTableData}) => {
     const classes = useStyles();
@@ -54,8 +55,6 @@ export default ({queue, refreshTableData}) => {
     }
     
     const last = queue[state.branch_type][queue.length - 1] + 1;
-    console.log(queue);
-    console.log(last);
 
     return (
         <StyledTableRow>
@@ -102,8 +101,6 @@ export default ({queue, refreshTableData}) => {
                         <IconButton onClick={cancelAddNew}><Close /></IconButton>
                     </Fragment>
                 }
-                
-                
             </StyledTableCell>
         </StyledTableRow>
     );

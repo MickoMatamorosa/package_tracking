@@ -14,14 +14,15 @@ class Branch extends Component {
 
         this.state = {
             name: null,
-            address: null
+            address: null,
+            search: ""
         }
     }
 
     componentDidMount(){
         if(localStorage.getItem('token')){
             userAuth()
-                .then(res => auth.user = res.user)
+                .then(res => auth.user = res.id)
                 .catch(err => localStorage.clear())
             
             branchProfile()
@@ -31,12 +32,17 @@ class Branch extends Component {
                 }).catch(err => console.log(err))
         }
     }
+
+    submitTracking = (search) => this.setState({search})
     
     render() {        
+        const {submitTracking, props, state} = this
         return (
             <Fragment>
-                <Header {...this.props} />
-                <Packages />
+                <Header {...props}
+                    {...{submitTracking}}/>
+                <Packages {...props}
+                    search={state.search}/>
             </Fragment>
         )
     }

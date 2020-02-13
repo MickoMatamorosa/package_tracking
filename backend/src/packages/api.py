@@ -1,29 +1,105 @@
-from packages.models import Package
+from branches.models import Branch, StatusFlow
+from packages.models import Package, PackageStatus
 from rest_framework import viewsets, permissions, generics, filters
-from .serializers import PackageSerializer
+from .serializers import PackageSerializer, PackageStatusSerializer
 from branches.serializers import StatusFlowSerializer
 from django_filters.rest_framework import DjangoFilterBackend
-
-# public package view
-class PackageViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Package.objects.all()
-    permission_classes = [permissions.AllowAny,]
-    serializer_class = PackageSerializer
-
+from rest_framework import status,viewsets
+from rest_framework.response import Response
+from django.http import Http404
 
 # user packages viewset (sending, receiving, sent)
 class UserPackageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,]
     serializer_class = PackageSerializer
-
+    
     def get_queryset(self):
-        queryset = []
+        _response = []
+        _queryset = []
+        
         user = self.request.user
         packages = Package.objects.filter
-        queryset.extend(packages(from_branch=user).values())
-        queryset.extend(packages(to_branch=user.branch).values())
-        return queryset
+        package_sent = packages(from_branch=user.id)
+        package_receive = packages(to_branch=user.branch)
+        package_type = self.request.query_params.get('type', None)
+
+        if package_type == 'sending':
+            _queryset.extend(package_sent)
+
+        elif package_type == 'receiving':
+            _queryset.extend(package_receive)
+
+        elif package_type == 'completed':
+            completed_packages = Package.objects.filter(completed=True).filter
+            _queryset.extend(completed_packages(from_branch=user.id))
+            _queryset.extend(completed_packages(to_branch=user.branch))
+
+        else:
+            _queryset.extend(package_sent)
+            _queryset.extend(package_receive)
+        
+        # request tracking
+        trace = self.request.query_params.get('trace', None)
+        if trace:
+            _queryset = packages(tracking_number=trace)
+
+        # set other branch name
+        for x in _queryset:
+            if user == x.from_branch:
+                x.branch_name = x.to_branch.name
+            else:
+                x.branch_name = x.from_branch.branch.name
+            _response.append(x)
+
+        if _response:
+            return _response
 
     def perform_create(self, serializer):
-        print(dir(serializer))
         serializer.save(from_branch=self.request.user)
+
+
+class PackageViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated,]
+    serializer_class = PackageSerializer
+    queryset = Package.objects.all()
+
+
+class PackageStatusViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated,]
+    serializer_class = PackageStatusSerializer
+
+    def get_queryset(self):
+        package = self.request.query_params.get('package', None)
+        return PackageStatus.objects.filter(package=package)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.status.queue > 1:
+            self.perform_destroy(instance)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+# public package status
+class PackageStatusGuestViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.AllowAny,]
+    serializer_class = PackageStatusSerializer
+
+    def get_queryset(self):
+        trace = self.request.query_params.get('trace', None)
+        package = Package.objects.get(tracking_number=trace)
+        return package.packagestatus_set.all()
+
+
+# public status view
+class PackageStatusDetailsViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.AllowAny,]
+    serializer_class = StatusFlowSerializer
+
+    def get_queryset(self):
+        trace = self.request.query_params.get('trace', None)
+        package = Package.objects.get(tracking_number=trace)
+        return [
+            *package.from_branch.branch.statusflow_set.filter(branch_type="sending"),
+            *package.to_branch.statusflow_set.filter(branch_type="receiving")
+        ]

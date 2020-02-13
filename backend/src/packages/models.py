@@ -11,20 +11,25 @@ def make_tracking():
 class Package(models.Model):
     client_fullname = models.CharField(max_length=200)
     client_address = models.CharField(max_length=500)
+    completed = models.BooleanField(default=False)
+    cancel = models.BooleanField(default=False)
+    branch_name = models.CharField(max_length=200, null=True, blank=True)
+
     tracking_number = models.CharField(
         max_length=50,
         editable=False,
         default=make_tracking
     )
+
     timestamp = models.DateTimeField(auto_now_add=True)
+
     from_branch = models.ForeignKey(
-        User,
-        related_name="sender",
+        User, related_name="sender",
         on_delete=models.CASCADE
     )
+
     to_branch = models.ForeignKey(
-        Branch,
-        related_name="receiver",
+        Branch, related_name="receiver",
         on_delete=models.CASCADE
     )
 
@@ -40,5 +45,8 @@ class Package(models.Model):
 class PackageStatus(models.Model):
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     status = models.ForeignKey(StatusFlow, on_delete=models.CASCADE)
-    remarks = models.CharField(max_length=50)
+    remarks = models.CharField(max_length=50, default="ongoing")
     timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-timestamp']
