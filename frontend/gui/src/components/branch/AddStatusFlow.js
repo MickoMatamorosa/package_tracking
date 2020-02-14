@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, Fragment } from 'react';
 
 import NativeSelect from '@material-ui/core/NativeSelect';
 import TextField from '@material-ui/core/TextField';
@@ -29,7 +29,7 @@ export default ({queue, refreshTableData}) => {
 
     const handleSave = e => {
         e.preventDefault()
-        if(state.description == "") setError(true)
+        if(state.description === "") setError(true)
         else {
             let data = state
             if(state.queue === ""){

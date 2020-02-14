@@ -15,7 +15,8 @@ import Delete from '@material-ui/icons/DeleteOutline';
 import Save from '@material-ui/icons/Save';
 import Close from '@material-ui/icons/Close';
 
-import { getBranchStatusFlow, updateStatusFlow, deleteStatusFlow } from '../../services/branchRequest';
+import { getBranchStatusFlow, updateStatusFlow, deleteStatusFlow 
+    } from '../../services/branchRequest';
 import { useStyles } from '../styles/Styler'
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 
@@ -44,6 +45,9 @@ export default (props) => {
     const statusFlow = () => {        
         getBranchStatusFlow()
             .then(res => {
+                if(res.length) props.setHasStatusFlow(true)
+                else props.setHasStatusFlow(false)
+
                 const queue = res.reduce(((acc, obj) => {
                     console.log(acc);
                     console.log(obj);
@@ -56,9 +60,7 @@ export default (props) => {
             .catch(err => console.log(err))
     }
 
-    useEffect(() => {
-        statusFlow()
-    }, [])
+    useEffect(() => statusFlow(), [])
 
     const handleSave = () => {
         if(editMode.description){
@@ -66,7 +68,6 @@ export default (props) => {
             .then(() => {
                 setEditMode(null)
                 statusFlow()
-                props.setFirstLogin(false)
             })
             .catch(err => console.log(err, "update failed!"))
         }else setError(true)
@@ -89,8 +90,7 @@ export default (props) => {
         <ConfirmAction {...{
             active, setActive,
             text: "delete",
-            actionFn: handleDelete
-        }}/>
+            actionFn: handleDelete}}/>
         <TableContainer component={Paper}>
         <Table className={classes.table} size='small' aria-label="customized table">
             <TableHead>
@@ -168,10 +168,8 @@ export default (props) => {
                 </StyledTableCell>
                 </StyledTableRow>
             ))}
-            {  !editMode && <AddStatusFlow 
-                    refreshTableData={statusFlow}
-                    queue={queue}
-                />
+            {  !editMode && <AddStatusFlow {...{ 
+                    queue, refreshTableData: statusFlow}}/>
             }
             </TableBody>
         </Table>

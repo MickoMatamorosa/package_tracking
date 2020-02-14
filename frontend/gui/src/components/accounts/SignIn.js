@@ -31,7 +31,7 @@ const SignIn = props => {
                 auth.login(() => props.history.push('/branch'))
             }).catch(err => auth.logout(() => {}))
         }
-    }, [props])
+    }, [props.history])
 
     const handleInputChange = (e) => setInput({
         ...input, [e.currentTarget.name]: e.currentTarget.value

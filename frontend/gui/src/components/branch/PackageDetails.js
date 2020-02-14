@@ -61,7 +61,7 @@ export default props => {
 
             getPackageStatusFlow()
         }
-    }, [props.pack.tracking_number]);
+    }, [props.pack.tracking_number, props.active, props.editMode]);
 
     const done = () => {
         doneStatus(props.pack.id, activeStat)
@@ -74,7 +74,7 @@ export default props => {
 
     const undo = () => {
         previousStatus(props.pack.id, activeStat)
-        .then(res => {
+        .then(() => {
             getPackageStatusFlow();
             setAnchorEl(null);
         });
@@ -120,7 +120,6 @@ export default props => {
                     <TableBody>{
                         [...receiveStat, ...sendStat].map(stat => {
                             let timestamp = false;
-                            let status = false;
                             
                             const packStat = packageStatus.filter(pack => 
                                 pack.package === props.pack.id &&
@@ -129,7 +128,6 @@ export default props => {
 
                             if(Boolean(packStat.length)){
                                 timestamp = packStat[0].timestamp
-                                status = packStat[0].remarks === "done"
                             }
 
                             return (<StyledTableRow key={stat.id}>

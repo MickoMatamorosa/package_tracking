@@ -61,7 +61,6 @@ export const getBranchStatusFlow = () => {
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)
-        .catch(err => err)
 }
 
 // branch all status flow
