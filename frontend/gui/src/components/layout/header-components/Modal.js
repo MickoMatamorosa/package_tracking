@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment} from 'react';
+import { useAlert } from 'react-alert';
 
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -13,6 +14,7 @@ import { branchProfile, getBranchStatusFlow } from '../../../services/branchRequ
 
 export default props => {
     const classes = useStyles()
+    const alert = useAlert();
     const [firstLogin, setFirstLogin] = useState(false);
     const [hasProfile, setHasProfile] = useState(true)
 
@@ -38,7 +40,7 @@ export default props => {
                     setHasProfile(false)
                     props.handleOpen('profile');
                     setFirstLogin(true);
-                } else checkStatusFlow();
+                }else checkStatusFlow();
             }).catch(err => console.log("MODAL", err))
         }
     }, [props.open])
@@ -46,7 +48,6 @@ export default props => {
     const handleClose = () => {
         // check if has status flow
         if(!hasProfile){
-
         }else if(!checkStatusFlow()){
             props.handleMenuClose();
             props.setOpen(false);

@@ -43,18 +43,9 @@ class App extends Component{
         <Fragment>
           <Container maxWidth="lg">
             <Switch>
-              <Route
-                exact path="/"
-                component={Main}
-              />
-              <PropRoute 
-                path="/login"
-                component={Login}
-              />
-              <PrivateRoute
-                path="/branch"
-                component={Branch}
-              />
+              <Route exact path="/" component={Main}/>
+              <PropRoute  path="/login" component={Login}/>
+              <PrivateRoute path="/branch" component={Branch}/>
             </Switch>
           </Container>
         </Fragment>

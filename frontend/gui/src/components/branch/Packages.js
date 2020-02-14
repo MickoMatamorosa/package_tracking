@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
+import { useAlert } from 'react-alert';
 
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -33,6 +34,7 @@ const defaultPack = {
 
 export default props => {
   const classes = useStyles();
+  const alert = useAlert();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = useState([]);
@@ -48,20 +50,24 @@ export default props => {
   const freshData = () => {
     getBranchPackages()
     .then(res => {
-      console.log(res, typeof res);
-      
       if(typeof res === "object"){
         setData(res)
         setSearch(props.search)
       }
-    })
-    .catch(err => console.log("ERROR", err))
+    }).catch(() => {})
   }
 
   useEffect(() => {
     if(search !== props.search){
-      getBranchPackages(null, props.search)
-      .then(res => setData(res))
+      if(props.search){
+        if(props.search.match(/^\d+$/)){
+          getBranchPackages(null, props.search)
+          .then(res => {
+            if(res.length) setData(res)
+            else alert.error("Tracking Number Not Found!!!")
+          })
+        } else alert.error("Invalid Tracking Number!!!");
+      }
     } else freshData()
   }, [props.search])
 

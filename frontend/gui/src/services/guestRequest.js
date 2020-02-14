@@ -7,7 +7,6 @@ export const getGuestPackageStatusRemarks = trace => {
     return axios
         .get(path, config)
         .then(res => res.data)
-        .catch(err => err)
 }
 
 
@@ -17,6 +16,5 @@ export const getGuestPackageStatus = trace => {
     return axios
         .get(path, config)
         .then(res => res.data)
-        .catch(err => err)
 }
 

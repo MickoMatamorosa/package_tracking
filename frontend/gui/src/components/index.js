@@ -9,8 +9,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import Paper from '@material-ui/core/Paper';
 
 import CheckSharpIcon from '@material-ui/icons/CheckSharp';
-import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 
+import { useAlert } from 'react-alert'
 import { StyledTableRow, StyledTableCell } from './styles/Table.styles'
 import { modalStyle } from './styles/Styler';
 
@@ -21,20 +21,25 @@ function Main(props){
     const classes = modalStyle();
     const [packageStat, setPackageStat] = useState(false);
     const [statFlow, setStatFlow] = useState(false);
+    const alert = useAlert();
 
     const submitTracking = trace => {
         setStatFlow(false)
         setPackageStat(false)
         if(trace){
-            getGuestPackageStatusRemarks(trace)
-            .then(res => {
-                getGuestPackageStatus(trace)
-                .then(result => {
-                    setStatFlow(res);
-                    setPackageStat(result);
+            if(trace.match(/^\d+$/)){
+                getGuestPackageStatusRemarks(trace)
+                .then(res => {
+                    getGuestPackageStatus(trace)
+                    .then(result => {
+                        setStatFlow(res);
+                        setPackageStat(result);
+                    })
+                }).catch(() => {
+                    alert.error("Tracking Number Not Found!!!");
                 })
-            })
-        }
+            } else alert.error("Invalid Tracking Number!!!");
+        }else alert.error("Empty Search Field!!!");
     }
 
     return (<Fragment>

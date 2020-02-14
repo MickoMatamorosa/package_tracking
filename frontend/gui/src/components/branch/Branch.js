@@ -7,6 +7,7 @@ import { branchProfile } from '../../services/branchRequest';
 import Header from '../layout/Header';
 import auth from '../../services/auth';
 import Packages from './Packages'
+import { withAlert } from 'react-alert';
 
 class Branch extends Component {
     constructor(props){
@@ -33,10 +34,14 @@ class Branch extends Component {
         }
     }
 
-    submitTracking = (search) => this.setState({search})
+    submitTracking = (search) => {
+        if(search.length) this.setState({search})
+        else this.props.alert.error("Empty Search Field!!!");
+    }
     
-    render() {        
+    render() {
         const {submitTracking, props, state} = this
+
         return (
             <Fragment>
                 <Header {...props}
@@ -52,4 +57,4 @@ Branch.propTypes = {
     isAuth: PropTypes.bool
 };
 
-export default Branch
+export default withAlert()(Branch)
