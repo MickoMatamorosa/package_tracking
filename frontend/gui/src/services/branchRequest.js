@@ -107,11 +107,13 @@ export const deleteStatusFlow = id => {
 
 
 // get branch packages
-export const getBranchPackages = (type, trace) => {
-    let path = `/api/user/package?`;
-    path += type ? `type=${type}` : '';
-    path += type && trace ? '&' : '';
-    path += trace ? `trace=${trace}` : '';
+export const getBranchPackages = (params) => {
+    const queryString = Boolean(params)
+        ? Object.keys(params).map(key => key + '=' + params[key]).join('&')
+        : "";
+        
+    let path = `/api/user/package?${queryString}`;
+
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)

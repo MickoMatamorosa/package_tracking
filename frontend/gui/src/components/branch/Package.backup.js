@@ -18,8 +18,8 @@ import { getBranchPackages} from '../../services/branchRequest';
 import { cancelPackage} from '../../services/packageRequest';
 import { useStyles } from '../styles/Styler'
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
-import PackageDetails from './PackageDetails'
 import TablePaginationActions from './PackagePagination';
+import PackageDetails from './PackageDetails'
 import NewPackage from './NewPackage';
 import ConfirmAction from '../common/ConfirmAction';
 import auth from '../../services/auth';
@@ -39,9 +39,9 @@ export default props => {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [openNew, setOpenNew] = useState(false)
-  const [pack, setPack] = useState(defaultPack)
-  const [active, setActive] = useState(null)
+  const [openNew, setOpenNew] = useState(false);
+  const [pack, setPack] = useState(defaultPack);
+  const [active, setActive] = useState(null);
 
   const closeView = () => setPack(defaultPack);
 
@@ -61,7 +61,7 @@ export default props => {
     if(search !== props.search){
       if(props.search){
         if(props.search.match(/^\d+$/)){
-          getBranchPackages(null, props.search)
+          getBranchPackages({tracking_number: props.search})
           .then(res => {
             if(res.length) setData(res)
             else alert.error("Tracking Number Not Found!!!")

@@ -1,5 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { useAlert } from 'react-alert';
+import React, { useState, Fragment } from 'react';
 
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -10,11 +9,8 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import Fab from '@material-ui/core/Fab';
 import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
 
-import { getBranchPackages} from '../../services/branchRequest';
 import { cancelPackage} from '../../services/packageRequest';
 import { useStyles } from '../styles/Styler'
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
@@ -30,52 +26,23 @@ const defaultPack = {
   client_address: '',
   from_branch: 0,
   to_branch: 0,
+  branch_name: { sender: '', receiver: '' }
 }
 
-export default props => {
+export default ({freshData, data, openNew, setOpenNew}) => {
   const classes = useStyles();
-  const alert = useAlert();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [data, setData] = useState([]);
-  const [search, setSearch] = useState("");
-  const [openNew, setOpenNew] = useState(false)
-  const [pack, setPack] = useState(defaultPack)
-  const [active, setActive] = useState(null)
+  const [pack, setPack] = useState(defaultPack);
+  const [active, setActive] = useState(null);
 
   const closeView = () => setPack(defaultPack);
 
-  const packageStatus = packData => setPack(packData)
-
-  const freshData = () => {
-    getBranchPackages()
-    .then(res => {
-      if(typeof res === "object"){
-        setData(res)
-        setSearch(props.search)
-      }
-    }).catch(() => {})
-  }
-
-  useEffect(() => {
-    if(search !== props.search){
-      if(props.search){
-        if(props.search.match(/^\d+$/)){
-          getBranchPackages(null, props.search)
-          .then(res => {
-            if(res.length) setData(res)
-            else alert.error("Tracking Number Not Found!!!")
-          })
-        } else alert.error("Invalid Tracking Number!!!");
-      }
-    } else freshData()
-  }, [props.search, props.hasProfile, props.hasStatusFlow])
+  const packageStatus = packData => setPack(packData);
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  const handleChangePage = (event, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = event => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -83,16 +50,9 @@ export default props => {
   };
 
   const actionFn = () => {
-    console.log("actions fn", active);
     setActive(null);
     cancelPackage(active)
     .then(() => freshData());
-  }
-
-  const handleNewPackage = () => {
-    if(!props.hasProfile) alert.error("Profile is Required!")
-    if(!props.hasStatusFlow) alert.error("Status FLow is Required!")
-    if(props.hasProfile && props.hasStatusFlow) setOpenNew(true)
   }
 
   return (<Fragment>
@@ -102,17 +62,6 @@ export default props => {
       active, setActive,
       actionFn, text: "cancel this package"
     }}/>
-
-    <div className={classes.addWrapper}>
-      <Fab size="medium"
-        color="primary"
-        aria-label="add"
-        variant="extended"
-        className={classes.fab}
-        onClick={handleNewPackage}>
-        <AddIcon />New Package
-      </Fab>
-    </div>
 
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="custom pagination table">
@@ -138,7 +87,12 @@ export default props => {
                 <StyledTableCell>{row.tracking_number}</StyledTableCell>
                 <StyledTableCell>{row.client_fullname}</StyledTableCell>
                 <StyledTableCell>{row.client_address}</StyledTableCell>
-                <StyledTableCell>{row.branch_name}</StyledTableCell>
+                <StyledTableCell>
+                  { auth.user === row.from_branch
+                    ? row.branch_name.receiver
+                    : row.branch_name.sender
+                  }
+                </StyledTableCell>
                 <StyledTableCell align="center">
                   { row.completed
                     ? "completed"
@@ -152,10 +106,8 @@ export default props => {
                 <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
                 <StyledTableCell align="center">
                   { !row.completed && auth.user === row.from_branch && (
-                    row.cancel
-                    ? "cancelled"
-                    : <Button size="small" onClick={() => setActive(row.id)}>
-                        cancel</Button>
+                    !row.cancel && 
+                    <Button size="small" onClick={() => setActive(row.id)}>cancel</Button>
                   )}
                 </StyledTableCell>
               </StyledTableRow>

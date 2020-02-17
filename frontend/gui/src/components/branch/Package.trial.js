@@ -12,10 +12,11 @@ import Box from '@material-ui/core/Box';
 
 import { getBranchPackages} from '../../services/branchRequest';
 import { cancelPackage} from '../../services/packageRequest';
-import { useStyles } from '../styles/Styler'
-import PackageDetails from './PackageDetails'
+import { useStyles } from '../styles/Styler';
+import PackageDetails from './PackageDetails';
 import NewPackage from './NewPackage';
 import ConfirmAction from '../common/ConfirmAction';
+import DataTable from './DataTable';
 
 const defaultPack = {
   tracking_number: false,
@@ -59,6 +60,7 @@ export default props => {
   const classes = useStyles();
   const alert = useAlert();
   const [search, setSearch] = useState("");
+  const [data, setData] = useState([]);
   const [openNew, setOpenNew] = useState(false);
   const [pack, setPack] = useState(defaultPack);
   const [active, setActive] = useState(null);
@@ -66,6 +68,8 @@ export default props => {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    console.log(event);
+    
   };
 
   const closeView = () => setPack(defaultPack);
@@ -74,8 +78,8 @@ export default props => {
     getBranchPackages()
     .then(res => {
       if(typeof res === "object"){
-        setData(res)
-        setSearch(props.search)
+        setData(res);
+        setSearch(props.search);
       }
     }).catch(() => {})
   }
@@ -84,7 +88,7 @@ export default props => {
     if(search !== props.search){
       if(props.search){
         if(props.search.match(/^\d+$/)){
-          getBranchPackages(null, props.search)
+          getBranchPackages({tracking_number: props.search})
           .then(res => {
             if(res.length) setData(res)
             else alert.error("Tracking Number Not Found!!!")
@@ -106,13 +110,15 @@ export default props => {
     if(props.hasProfile && props.hasStatusFlow) setOpenNew(true)
   }
 
+
+
   return (<Fragment>
     <PackageDetails {...{pack, closeView, freshData, active}}/>
     <NewPackage {...{openNew, setOpenNew, freshData}}/>
-    <ConfirmAction {...{
-      active, setActive,
+    <ConfirmAction {...{ active, setActive,
       actionFn, text: "cancel this package"
     }}/>
+
     <AppBar position="static" color="default" style={{marginTop: 10}}>
       <Tabs value={value} onChange={handleChange}
         variant="scrollable"
@@ -124,6 +130,7 @@ export default props => {
         <Tab label="Completed" {...a11yProps(3)} />
         <Tab label="Cancelled" {...a11yProps(4)} />
       </Tabs>
+
       <Fab size="small"
         color="primary"
         aria-label="add"
@@ -132,20 +139,10 @@ export default props => {
         <AddIcon />
       </Fab>
     </AppBar>
-    <TabPanel value={value} index={0}>
-      All
-    </TabPanel>
-    <TabPanel value={value} index={1}>
-      Sending
-    </TabPanel>
-    <TabPanel value={value} index={2}>
-      Receiving
-    </TabPanel>
-    <TabPanel value={value} index={3}>
-      Completed
-    </TabPanel>
-    <TabPanel value={value} index={4}>
-      Cancelled
+    
+    <TabPanel value={value} index={value}>
+      myxz
+      {/* <DataTable/> */}
     </TabPanel>
     </Fragment>);
 }

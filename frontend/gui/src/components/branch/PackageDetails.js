@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAlert } from 'react-alert';
 
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -23,9 +24,10 @@ import auth from '../../services/auth';
 
 export default props => {
     const classes = modalStyle();
+    const alert = useAlert()
     const [packageStatus, setPackageStatus] = useState([]);
-    const [sendStat, setSendStat] = useState([])
-    const [receiveStat, setReceiveStat] = useState([])
+    const [sendStat, setSendStat] = useState([]);
+    const [receiveStat, setReceiveStat] = useState([]);
     const [userType, setUserType] = useState('');
     const [anchorEl, setAnchorEl] = useState(null);
     const [activeStat, setActiveStat] = useState(null);
@@ -77,7 +79,8 @@ export default props => {
         .then(() => {
             getPackageStatusFlow();
             setAnchorEl(null);
-        });
+        })
+        .catch(() => alert.error("Can't undo first transaction status!"));
     }
     
     const handleClick = (event, stat) => {
@@ -100,10 +103,10 @@ export default props => {
         BackdropProps={{timeout: 500}}>
         <div className={classes.paper}>
             <h2 id="spring-modal-title">{props.pack.tracking_number}</h2>
-            <h3>{ auth.user===props.pack.from_branch
-                  ? "Sending to "
-                  : "Receiving from "
-                }{props.pack.branch_name}
+            <h3>{ auth.user === props.pack.from_branch
+                  ? `Sending to ${props.pack.branch_name.receiver}`
+                  : `Receiving from ${props.pack.branch_name.sender}`
+                }
             </h3>
             <div id="spring-modal-description">
                 <div>{props.pack.client_fullname}</div>
@@ -125,7 +128,6 @@ export default props => {
                                 pack.package === props.pack.id &&
                                 pack.status === stat.id);
                             
-
                             if(Boolean(packStat.length)){
                                 timestamp = packStat[0].timestamp
                             }
@@ -142,6 +144,7 @@ export default props => {
                                     : userType !== stat.branch_type
                                       ? <LocalShippingIcon color="primary"/>
                                       : <IconButton aria-describedby={id}
+                                          disabled={props.pack.cancel}
                                           onClick={e => handleClick(e, packStat[0].id)}>
                                           <LocalShippingIcon color="primary"/>
                                         </IconButton>
@@ -153,7 +156,7 @@ export default props => {
                     }</TableBody>
                 </Table>
                 <Popover id={id}
-                    open={open}
+                    open={Boolean(open)}
                     anchorEl={anchorEl}
                     onClose={handleClose}
                     anchorOrigin={positions}

@@ -12,56 +12,37 @@ from django.http import Http404
 class UserPackageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,]
     serializer_class = PackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['from_branch', 'to_branch',
+        'completed', 'cancel', 'tracking_number']
     
     def get_queryset(self):
-        _response = []
-        _queryset = []
-        
         user = self.request.user
         packages = Package.objects.filter
         package_sent = packages(from_branch=user.id)
         package_receive = packages(to_branch=user.branch)
-        package_type = self.request.query_params.get('type', None)
-
-        if package_type == 'sending':
-            _queryset.extend(package_sent)
-
-        elif package_type == 'receiving':
-            _queryset.extend(package_receive)
-
-        elif package_type == 'completed':
-            completed_packages = Package.objects.filter(completed=True).filter
-            _queryset.extend(completed_packages(from_branch=user.id))
-            _queryset.extend(completed_packages(to_branch=user.branch))
-
-        else:
-            _queryset.extend(package_sent)
-            _queryset.extend(package_receive)
         
-        # request tracking
-        trace = self.request.query_params.get('trace', None)
-        if trace:
-            _queryset = packages(tracking_number=trace)
-
-        # set other branch name
-        for x in _queryset:
-            if user == x.from_branch:
-                x.branch_name = x.to_branch.name
-            else:
-                x.branch_name = x.from_branch.branch.name
-            _response.append(x)
-
-        if _response:
-            return _response
+        return package_sent | package_receive
 
     def perform_create(self, serializer):
         serializer.save(from_branch=self.request.user)
 
+    def update(self, request, *args, **kwargs):
+        auth = self.request.user
+        instance = self.get_object()
+        if auth == instance.from_branch:
+            partial = kwargs.pop('partial', False)
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
 
-class PackageViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated,]
-    serializer_class = PackageSerializer
-    queryset = Package.objects.all()
+            if getattr(instance, '_prefetched_objects_cache', None):
+                instance._prefetched_objects_cache = {}
+
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)        
+
 
 
 class PackageStatusViewSet(viewsets.ModelViewSet):
@@ -86,20 +67,7 @@ class PackageStatusGuestViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PackageStatusSerializer
 
     def get_queryset(self):
-        trace = self.request.query_params.get('trace', None)
-        package = Package.objects.get(tracking_number=trace)
+        print(self.kwargs['trace'])
+        package = Package.objects.get(tracking_number=self.kwargs['trace'])
         return package.packagestatus_set.all()
-
-
-# public status view
-class PackageStatusDetailsViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [permissions.AllowAny,]
-    serializer_class = StatusFlowSerializer
-
-    def get_queryset(self):
-        trace = self.request.query_params.get('trace', None)
-        package = Package.objects.get(tracking_number=trace)
-        return [
-            *package.from_branch.branch.statusflow_set.filter(branch_type="sending"),
-            *package.to_branch.statusflow_set.filter(branch_type="receiving")
-        ]
+            
