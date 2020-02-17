@@ -17,15 +17,16 @@ import AddIcon from '@material-ui/icons/Add';
 import DataTable from './DataTable';
 import { useStyles } from '../styles/Styler';
 import { getBranchPackages} from '../../services/branchRequest';
+import auth from '../../services/auth';
 
 const options = ['All', 'Sending', 'Receiving', 'Completed', 'Cancelled'];
-const optionsValue = {
-  'All': '',
-  'Sending': { type: 'sending' },
-  'Receiving': { type: 'receiving' },
-  'Completed': { complete: true },
-  'Cancelled': { cancel: true }
-};
+const optionsValue = [
+  '',
+  { from_branch: auth.user },
+  // { to_branch: 'receiving' }, 
+  { completed: true },
+  { cancel: true }
+];
 
 export default props => {
   const classes = useStyles();
@@ -40,7 +41,9 @@ export default props => {
   const [search, setSearch] = useState("");
 
   const freshData = () => {
-    getBranchPackages()
+    console.log(optionsValue[selectedIndex]);
+    
+    getBranchPackages(optionsValue[selectedIndex])
     .then(res => {
       if(typeof res === "object"){
         setData(res);
@@ -73,7 +76,7 @@ export default props => {
         } else alert.error("Invalid Tracking Number!!!");
       }
     } else freshData()
-  }, [props.search, props.hasProfile, props.hasStatusFlow]);
+  }, [props.search, props.hasProfile, props.hasStatusFlow, selectedIndex]);
 
   const handleNewPackage = () => {
     if(!props.hasProfile) alert.error("Profile is Required!");
@@ -116,8 +119,7 @@ export default props => {
                         <MenuItem
                           key={option}
                           selected={index === selectedIndex}
-                          onClick={event => handleMenuItemClick(event, index)}
-                        >
+                          onClick={event => handleMenuItemClick(event, index)}>
                           {option}
                         </MenuItem>
                       ))}
