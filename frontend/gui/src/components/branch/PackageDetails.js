@@ -121,7 +121,7 @@ export default props => {
                     </StyledTableRow>
                     </TableHead>
                     <TableBody>{
-                        [...receiveStat, ...sendStat].map(stat => {
+                        receiveStat && sendStat && [...receiveStat, ...sendStat].map(stat => {
                             let timestamp = false;
                             
                             const packStat = packageStatus.filter(pack => 

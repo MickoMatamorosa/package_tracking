@@ -61,15 +61,16 @@ class Branch extends Component {
         
         if(localStorage.getItem('token')){
             userAuth()
-                .then(res => auth.user = res.id)
-                .catch(err => localStorage.clear())
+                .then(res => {
+                    if(res) auth.user = res.id
+                    else auth.logout(() => this.props.history.push('/login'))
+                })
             
             this.checkUser()
         }
     }
 
     submitTracking = (search) => {
-        console.log("Branch => submittracking");
         if(search.length) this.setState({search})
         else this.props.alert.error("Empty Search Field!!!");
     }

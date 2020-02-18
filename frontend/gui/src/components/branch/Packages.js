@@ -17,16 +17,10 @@ import AddIcon from '@material-ui/icons/Add';
 import DataTable from './DataTable';
 import { useStyles } from '../styles/Styler';
 import { getBranchPackages} from '../../services/branchRequest';
-import auth from '../../services/auth';
+
+import noRecordFound from '../../images/no-record-found.gif';
 
 const options = ['All', 'Sending', 'Receiving', 'Completed', 'Cancelled'];
-const optionsValue = [
-  '',
-  { from_branch: auth.user },
-  // { to_branch: 'receiving' }, 
-  { completed: true },
-  { cancel: true }
-];
 
 export default props => {
   const classes = useStyles();
@@ -41,9 +35,15 @@ export default props => {
   const [search, setSearch] = useState("");
 
   const freshData = () => {
-    console.log(optionsValue[selectedIndex]);
+    let params = { completed: false, cancel: false }
+    switch(selectedIndex){
+      case 1: params.from_branch = true; break;
+      case 2: params.to_branch = true; break;
+      case 3: params.completed = true; break;
+      case 4: params.cancel = true; break;
+    }
     
-    getBranchPackages(optionsValue[selectedIndex])
+    getBranchPackages(params)
     .then(res => {
       if(typeof res === "object"){
         setData(res);
@@ -70,12 +70,12 @@ export default props => {
         if(props.search.match(/^\d+$/)){
           getBranchPackages({tracking_number: props.search})
           .then(res => {
-            if(res.length) setData(res)
-            else alert.error("Tracking Number Not Found!!!")
+            if(res.length) setData(res);
+            else alert.error("Tracking Number Not Found!!!");
           })
         } else alert.error("Invalid Tracking Number!!!");
       }
-    } else freshData()
+    } else freshData();
   }, [props.search, props.hasProfile, props.hasStatusFlow, selectedIndex]);
 
   const handleNewPackage = () => {
@@ -83,8 +83,6 @@ export default props => {
     if(!props.hasStatusFlow) alert.error("Status FLow is Required!");
     if(props.hasProfile && props.hasStatusFlow) setOpenNew(true);
   }
-
-  console.log(selectedIndex);
 
   return (<Fragment>
     <div className={classes.addWrapper}>
@@ -141,6 +139,10 @@ export default props => {
       </Fab>
     </div>
     
-    <DataTable {...props} {...{data, freshData, openNew, setOpenNew}} />
+    { data.length
+      ? <DataTable {...props} {...{data, freshData, openNew, setOpenNew}}/>
+      : <Grid container justify="center" style={{paddingTop: 100}}>
+          <img src={noRecordFound}/></Grid>
+    }
   </Fragment>);
 }

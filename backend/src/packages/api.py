@@ -13,15 +13,22 @@ class UserPackageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,]
     serializer_class = PackageSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['from_branch', 'to_branch',
-        'completed', 'cancel', 'tracking_number']
+    filterset_fields = ['completed', 'cancel', 'tracking_number']
     
     def get_queryset(self):
         user = self.request.user
         packages = Package.objects.filter
         package_sent = packages(from_branch=user.id)
         package_receive = packages(to_branch=user.branch)
+        from_branch = self.request.query_params.get('from_branch', None)
+        to_branch = self.request.query_params.get('to_branch', None)
         
+        if from_branch:
+            return package_sent
+        
+        if to_branch:
+            return package_receive
+
         return package_sent | package_receive
 
     def perform_create(self, serializer):

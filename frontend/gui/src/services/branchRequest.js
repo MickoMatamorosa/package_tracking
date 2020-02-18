@@ -114,6 +114,11 @@ export const getBranchPackages = (params) => {
         
     let path = `/api/user/package?${queryString}`;
 
+    console.log(queryString);
+    console.log(path);
+    
+    
+
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)
