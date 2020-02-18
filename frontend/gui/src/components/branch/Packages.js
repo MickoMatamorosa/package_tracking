@@ -97,8 +97,7 @@ export default props => {
               aria-expanded={open ? 'true' : undefined}
               aria-label="select merge strategy"
               aria-haspopup="menu"
-              onClick={handleToggle}
-            >
+              onClick={handleToggle}>
               <ArrowDropDownIcon />
             </Button>
           </ButtonGroup>

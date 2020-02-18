@@ -33,3 +33,12 @@ export const logout = () => {
     .then(res => res.data)
     .catch(() => false);
 };
+
+
+// CHANGE PASSWORD
+export const changePass = body => {
+  const strBody = JSON.stringify(body);
+  const path = "/api/auth/change-password";
+
+  return axios.patch(path, strBody, tokenConfig())
+}
