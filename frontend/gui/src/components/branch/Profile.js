@@ -85,8 +85,8 @@ export default class Profile extends Component {
         const { name, address } = this.state;
         saveUserProfile({ name, address })
         .then(res => {
-            this.props.setFirstLogin(false);
-            this.props.setHasProfile(true)
+            this.props.setHasProfile(true);
+            this.props.setHasProfile(true);
             this.props.handleClose();
         })
     }

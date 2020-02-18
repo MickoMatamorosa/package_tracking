@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'
+import { useAlert } from 'react-alert'
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -11,6 +12,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 
+
 import { login, userAuth } from '../../services/authRequest';
 import auth from '../../services/auth';
 
@@ -18,8 +20,9 @@ import useStyles from './SignIn.style'
 
 const SignIn = props => {
     
+    const alert = useAlert();
     const classes = useStyles();
-    const [input, setInput] = useState({});
+    const [input, setInput] = useState({username: "", password: ""});
 
     useEffect(() => {
         // is already logged-in
@@ -28,7 +31,7 @@ const SignIn = props => {
                 auth.login(() => props.history.push('/branch'))
             }).catch(err => auth.logout(() => {}))
         }
-    }, [props])
+    }, [props.history])
 
     const handleInputChange = (e) => setInput({
         ...input, [e.currentTarget.name]: e.currentTarget.value
@@ -36,15 +39,15 @@ const SignIn = props => {
 
     const submit = e => {
         e.preventDefault();
+        setInput({...input, password: ""})
         
         const {username, password} = input
         login(username, password)
         .then(res => {
             if(res) {
+                alert.success("Successfully Logged In!")
                 auth.login(() => props.history.push('/branch'))
-            }else{
-                console.log("Invalid Username or Password!!!");
-            }
+            } else alert.error("Invalid Username or Password")
         })
     }
    
@@ -64,6 +67,7 @@ const SignIn = props => {
                         fullWidth
                         label="Username"
                         name="username"
+                        value={input.username}
                         autoFocus
                     />
                     <TextField
@@ -77,6 +81,7 @@ const SignIn = props => {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        value={input.password}
                     />
                     <Button
                         type="submit"

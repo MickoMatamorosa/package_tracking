@@ -13,7 +13,6 @@ class Package(models.Model):
     client_address = models.CharField(max_length=500)
     completed = models.BooleanField(default=False)
     cancel = models.BooleanField(default=False)
-    branch_name = models.CharField(max_length=200, null=True, blank=True)
 
     tracking_number = models.CharField(
         max_length=50,
@@ -23,19 +22,12 @@ class Package(models.Model):
 
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    from_branch = models.ForeignKey(
-        User, related_name="sender",
-        on_delete=models.CASCADE
-    )
+    from_branch = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    to_branch = models.ForeignKey(
-        Branch, related_name="receiver",
-        on_delete=models.CASCADE
-    )
+    to_branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ['from_branch', 'to_branch', 'tracking_number']
-        ordering = ['timestamp']
 
     def __str__(self):
         return '%s (%s)' % (self.tracking_number, self.timestamp)

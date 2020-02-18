@@ -9,31 +9,29 @@ import TableContainer from '@material-ui/core/TableContainer';
 import Paper from '@material-ui/core/Paper';
 
 import CheckSharpIcon from '@material-ui/icons/CheckSharp';
-import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 
+import { useAlert } from 'react-alert'
 import { StyledTableRow, StyledTableCell } from './styles/Table.styles'
 import { modalStyle } from './styles/Styler';
 
-import { getGuestPackageStatus, getGuestPackageStatusRemarks } from '../services/guestRequest'
+import { getGuestPackageStatus } from '../services/guestRequest'
 
 
 function Main(props){
     const classes = modalStyle();
     const [packageStat, setPackageStat] = useState(false);
-    const [statFlow, setStatFlow] = useState(false);
+    const alert = useAlert();
 
     const submitTracking = trace => {
-        setStatFlow(false)
         setPackageStat(false)
         if(trace){
-            getGuestPackageStatusRemarks(trace)
-            .then(res => {
+            if(trace.match(/^\d+$/)){
                 getGuestPackageStatus(trace)
-                .then(result => {
-                    setStatFlow(res);
-                    setPackageStat(result);
+                .then(res => setPackageStat(res))
+                .catch(() => {
+                    alert.error("Tracking Number Not Found!!!");
                 })
-            })
+            } else alert.error("Invalid Tracking Number!!!");
         }
     }
 
@@ -52,14 +50,13 @@ function Main(props){
             </StyledTableRow>
             </TableHead>
             <TableBody>
-                {   statFlow && packageStat && packageStat.map(row => {
-                        const description = statFlow.filter(sf => sf.id === row.status)
-                        return (<StyledTableRow key={row.id}>
+                {   packageStat && packageStat.map(row => (
+                        <StyledTableRow key={row.id}>
                             <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
                             <StyledTableCell><CheckSharpIcon color="primary"/></StyledTableCell>
-                            <StyledTableCell>{description[0].description}</StyledTableCell>
+                            <StyledTableCell>{row.description}</StyledTableCell>
                         </StyledTableRow>)
-                    })
+                    )
                 }
             </TableBody>
         </Table>

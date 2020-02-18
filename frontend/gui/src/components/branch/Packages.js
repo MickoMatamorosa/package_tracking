@@ -1,180 +1,148 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, useRef } from 'react';
+import { useAlert } from 'react-alert';
 
-import Table from '@material-ui/core/Table';
-import TableHead from '@material-ui/core/TableHead';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableFooter from '@material-ui/core/TableFooter';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import Fab from '@material-ui/core/Fab';
+import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
+import MenuItem from '@material-ui/core/MenuItem';
+import MenuList from '@material-ui/core/MenuList';
+import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 
+import DataTable from './DataTable';
+import { useStyles } from '../styles/Styler';
 import { getBranchPackages} from '../../services/branchRequest';
-import { cancelPackage} from '../../services/packageRequest';
-import { useStyles } from '../styles/Styler'
-import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
-import PackageDetails from './PackageDetails'
-import TablePaginationActions from './PackagePagination';
-import NewPackage from './NewPackage';
-import ConfirmAction from '../common/ConfirmAction';
-import auth from '../../services/auth';
 
-const defaultPack = {
-  tracking_number: false,
-  client_fullname: '',
-  client_address: '',
-  from_branch: 0,
-  to_branch: 0,
-}
+import noRecordFound from '../../images/no-record-found.gif';
+
+const options = ['All', 'Sending', 'Receiving', 'Completed', 'Cancelled'];
 
 export default props => {
   const classes = useStyles();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const alert = useAlert();
+
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  
+  const [openNew, setOpenNew] = useState(false);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [openNew, setOpenNew] = useState(false)
-  const [pack, setPack] = useState(defaultPack)
-  const [active, setActive] = useState(null)
-
-  const closeView = () => setPack(defaultPack);
-
-  const packageStatus = packData => setPack(packData)
 
   const freshData = () => {
-    getBranchPackages()
+    let params = { completed: false, cancel: false }
+    switch(selectedIndex){
+      case 1: params.from_branch = true; break;
+      case 2: params.to_branch = true; break;
+      case 3: params.completed = true; break;
+      case 4: params.cancel = true; break;
+    }
+    
+    getBranchPackages(params)
     .then(res => {
-      console.log(res, typeof res);
-      
       if(typeof res === "object"){
-        setData(res)
-        setSearch(props.search)
+        setData(res);
+        setSearch(props.search);
       }
-    })
-    .catch(err => console.log("ERROR", err))
-  }
+    }).catch(() => {})
+  };
+
+  const handleMenuItemClick = (event, index) => {
+    setSelectedIndex(index);
+    setOpen(false);
+  };
+
+  const handleToggle = () => setOpen(prevOpen => !prevOpen);
+
+  const handleClose = event => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) return;
+    setOpen(false);
+  };
 
   useEffect(() => {
     if(search !== props.search){
-      getBranchPackages(null, props.search)
-      .then(res => setData(res))
-    } else freshData()
-  }, [props.search])
+      if(props.search){
+        if(props.search.match(/^\d+$/)){
+          getBranchPackages({tracking_number: props.search})
+          .then(res => {
+            if(res.length) setData(res);
+            else alert.error("Tracking Number Not Found!!!");
+          })
+        } else alert.error("Invalid Tracking Number!!!");
+      }
+    } else freshData();
+  }, [props.search, props.hasProfile, props.hasStatusFlow, selectedIndex]);
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = event => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const actionFn = () => {
-    console.log("actions fn", active);
-    setActive(null);
-    cancelPackage(active)
-    .then(() => freshData());
-  }  
+  const handleNewPackage = () => {
+    if(!props.hasProfile) alert.error("Profile is Required!");
+    if(!props.hasStatusFlow) alert.error("Status FLow is Required!");
+    if(props.hasProfile && props.hasStatusFlow) setOpenNew(true);
+  }
 
   return (<Fragment>
-    <PackageDetails {...{pack, closeView, freshData, active}}/>
-    <NewPackage {...{openNew, setOpenNew, freshData}}/>
-    <ConfirmAction {...{
-      active, setActive,
-      actionFn, text: "cancel this package"
-    }}/>
-
     <div className={classes.addWrapper}>
+      <Grid container direction="column" alignItems="flex-start">
+        <Grid item xs={12}>
+          <ButtonGroup variant="contained" color="primary" ref={anchorRef} aria-label="split button">
+            <Button onClick={freshData}>{options[selectedIndex]}</Button>
+            <Button
+              color="primary"
+              size="small"
+              aria-controls={open ? 'split-button-menu' : undefined}
+              aria-expanded={open ? 'true' : undefined}
+              aria-label="select merge strategy"
+              aria-haspopup="menu"
+              onClick={handleToggle}
+            >
+              <ArrowDropDownIcon />
+            </Button>
+          </ButtonGroup>
+          
+          <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                style={{ transformOrigin:
+                  placement === 'bottom' ? 'center top' : 'center bottom',
+                }}>
+                <Paper>
+                  <ClickAwayListener onClickAway={handleClose}>
+                    <MenuList id="split-button-menu">
+                      {options.map((option, index) => (
+                        <MenuItem
+                          key={option}
+                          selected={index === selectedIndex}
+                          onClick={event => handleMenuItemClick(event, index)}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
+        </Grid>
+      </Grid>
       <Fab size="medium"
         color="primary"
         aria-label="add"
         variant="extended"
         className={classes.fab}
-        onClick={() => setOpenNew(true)}>
+        onClick={handleNewPackage}>
         <AddIcon />New Package
       </Fab>
     </div>
-
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="custom pagination table">
-        <TableHead>
-          <StyledTableRow>
-            <StyledTableCell align="center">Tracking No.</StyledTableCell>
-            <StyledTableCell align="center">Client Name</StyledTableCell>
-            <StyledTableCell align="center">Client Address</StyledTableCell>
-            <StyledTableCell align="center">Other Branch</StyledTableCell>
-            <StyledTableCell align="center">Status</StyledTableCell>
-            <StyledTableCell align="center">Datetime</StyledTableCell>
-            <StyledTableCell/>
-          </StyledTableRow>
-        </TableHead>
-
-        <TableBody>
-          { data && (rowsPerPage > 0
-            ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : data
-            ).map(row => (
-              <StyledTableRow key={row.id} hover style={{cursor: 'pointer'}}
-                onClick={() => packageStatus(row)}>
-                <StyledTableCell>{row.tracking_number}</StyledTableCell>
-                <StyledTableCell>{row.client_fullname}</StyledTableCell>
-                <StyledTableCell>{row.client_address}</StyledTableCell>
-                <StyledTableCell>{row.branch_name}</StyledTableCell>
-                <StyledTableCell align="center">
-                  { row.completed
-                    ? "completed"
-                    : row.cancel
-                      ? "cancelled"
-                      : auth.user === row.from_branch
-                        ? "sending"
-                        : "receiving"
-                  }
-                </StyledTableCell>
-                <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
-                <StyledTableCell align="center">
-                  { !row.completed && auth.user === row.from_branch && (
-                    row.cancel
-                    ? "cancelled"
-                    : <Button size="small" onClick={() => setActive(row.id)}>
-                        cancel</Button>
-                  )}
-                </StyledTableCell>
-              </StyledTableRow>
-            ))
-          }
-          { emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
-            </TableRow>
-          )}
-        </TableBody>
-
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              colSpan={7}
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              count={data.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: { 'aria-label': 'rows per page' },
-                native: true,
-              }}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
-    </Fragment>);
+    
+    { data.length
+      ? <DataTable {...props} {...{data, freshData, openNew, setOpenNew}}/>
+      : <Grid container justify="center" style={{paddingTop: 100}}>
+          <img src={noRecordFound}/></Grid>
+    }
+  </Fragment>);
 }

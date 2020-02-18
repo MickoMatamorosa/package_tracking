@@ -14,7 +14,8 @@ export const useStyles = makeStyles(theme => ({
     },
     fab: {
         position: 'absolute',
-        right: 5
+        right: 5,
+        top: 4
     }
 }));
 

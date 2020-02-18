@@ -17,7 +17,7 @@ export const addPackage = body => {
 
 export const cancelPackage = id => {
     const body = JSON.stringify({cancel: true});
-    const path = `/api/package/${id}/`;
+    const path = `/api/user/package/${id}/`;
     return axios
         .patch(path, body, tokenConfig())
         .then(res => res.data)
@@ -26,7 +26,7 @@ export const cancelPackage = id => {
 
 // get package status by user
 export const getPackage = trace => {
-    const path = `/api/user/package?trace=${trace}`;
+    const path = `/api/user/package?tracking_number=${trace}`;
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)
@@ -61,5 +61,4 @@ export const previousStatus = (pack_id, stat_id) => {
 
     return axios.delete(path, tokenConfig())
         .then(res => res.data)
-        .catch(err => err)
 }

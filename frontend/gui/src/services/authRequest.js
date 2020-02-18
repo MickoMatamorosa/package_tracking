@@ -9,8 +9,7 @@ export const login = async (username, password) => {
         .then(res => {
             localStorage.setItem('token', res.data.token)
             return res.data
-        })
-        .catch(err => false);
+        }).catch(() => false);
 }
 
 
@@ -19,7 +18,7 @@ export const userAuth = () => {
   return axios
     .get("/api/auth/user", tokenConfig())
     .then(res => res.data)
-    .catch(err => {
+    .catch(() => {
       localStorage.clear();
       return false
     })
@@ -32,5 +31,5 @@ export const logout = () => {
   return axios
     .post("/api/auth/logout/", null, tokenConfig())
     .then(res => res.data)
-    .catch(err => console.log(err));
+    .catch(() => false);
 };
