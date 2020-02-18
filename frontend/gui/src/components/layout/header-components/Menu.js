@@ -26,6 +26,7 @@ export default props => {
             onClose={props.handleMenuClose}>
             <MenuItem onClick={() => props.handleOpen('profile')}>Profile</MenuItem>
             <MenuItem onClick={() => props.handleOpen('status-flow')}>Status Flow</MenuItem>
+            <MenuItem onClick={() => props.handleOpen('change-pass')}>Change Password</MenuItem>
             <MenuItem onClick={exit}>Logout</MenuItem>
         </Menu>);
 }

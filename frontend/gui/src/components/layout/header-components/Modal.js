@@ -6,10 +6,22 @@ import useStyles from '../../styles/Header.style';
 
 import Profile from '../../branch/Profile';
 import StatusFlow from '../../branch/StatusFlow';
+import ChangePass from '../../branch/ChangePass';
 
 import auth from '../../../services/auth';
 import { userAuth } from '../../../services/authRequest';
 
+const ModalWrapper = props => {
+    const classes = useStyles();
+    const Component = props.component;
+    
+    return (<div className={classes.paper}>
+        <h2 id="spring-modal-title">{ props.title }</h2>
+        <div id="spring-modal-description">
+            <Component {...props}/>
+        </div>
+    </div>)
+}
 
 export default props => {
     const classes = useStyles();
@@ -37,19 +49,18 @@ export default props => {
         BackdropComponent={Backdrop}
         BackdropProps={{timeout: 500}}>
         {   props.modal === 'profile'
-          ? <div className={classes.paper}>
-                <h2 id="spring-modal-title">Profile</h2>
-                <div id="spring-modal-description">
-                    <Profile {...props} {...{handleClose}} />
-                </div>
-            </div>
-          :(props.modal === 'status-flow' &&
-            <div className={classes.paper}>
-                <h2 id="spring-modal-title">Status Flow</h2>
-                <div id="spring-modal-description">
-                    <StatusFlow {...props} {...{handleClose}} />
-                </div>
-            </div>)
+          ? <ModalWrapper {...props} {...{
+              handleClose, title: "Profile",
+              component: Profile }}/>
+          : props.modal === 'status-flow'
+            ? <ModalWrapper {...props} {...{
+                handleClose, title: "Transaction Status Flow",
+                component: StatusFlow
+            }}/>
+            : (props.modal === 'change-pass' && 
+              <ModalWrapper {...props} {...{
+                handleClose, title: "Change Password",
+                component: ChangePass }}/>)
         }
     </Modal>)
 }
