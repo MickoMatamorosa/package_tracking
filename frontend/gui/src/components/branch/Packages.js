@@ -15,6 +15,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 
 import DataTable from './DataTable';
+import NewPackage from './NewPackage';
 import { useStyles } from '../styles/Styler';
 import { getBranchPackages} from '../../services/branchRequest';
 
@@ -42,7 +43,7 @@ export default props => {
       case 3: params.completed = true; break;
       case 4: params.cancel = true; break;
     }
-    
+
     getBranchPackages(params)
     .then(res => {
       if(typeof res === "object"){
@@ -79,16 +80,21 @@ export default props => {
   }, [props.search, props.hasProfile, props.hasStatusFlow, selectedIndex]);
 
   const handleNewPackage = () => {
+    console.log(props.hasProfile);
+    console.log(props.hasStatusFlow);
+    
     if(!props.hasProfile) alert.error("Profile is Required!");
     if(!props.hasStatusFlow) alert.error("Status FLow is Required!");
     if(props.hasProfile && props.hasStatusFlow) setOpenNew(true);
   }
 
   return (<Fragment>
+    <NewPackage {...{openNew, setOpenNew, freshData}}/>
     <div className={classes.addWrapper}>
       <Grid container direction="column" alignItems="flex-start">
         <Grid item xs={12}>
-          <ButtonGroup variant="contained" color="primary" ref={anchorRef} aria-label="split button">
+          <ButtonGroup disabled={Boolean(props.search)}
+            variant="contained" color="primary" ref={anchorRef} aria-label="split button">
             <Button onClick={freshData}>{options[selectedIndex]}</Button>
             <Button
               color="primary"

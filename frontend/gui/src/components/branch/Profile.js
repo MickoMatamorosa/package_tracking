@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withAlert } from 'react-alert';
 
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -6,18 +7,14 @@ import Grid from '@material-ui/core/Grid';
 
 import { branchProfile, saveUserProfile } from '../../services/branchRequest';
 
-export default class Profile extends Component {
+class Profile extends Component {
     constructor(props){
         super(props);
 
         this.state = {
             user: null,
-            name: null,
-            address: null,
-            shrink: {
-                name: false,
-                address: false,
-            },
+            name: "",
+            address: "",
             isValid: true,
             isUserUpdate: false,
             origProfile: null
@@ -30,13 +27,7 @@ export default class Profile extends Component {
             const { name, address } = res
             const origProfile = { name, address }
             
-            this.setState({ 
-                name, address, origProfile,
-                shrink: {
-                    name: Boolean(name),
-                    address: Boolean(address),
-                },
-            })
+            this.setState({ name, address, origProfile})
         }).catch(err => {
             console.log("can't fetch branch profile", err)
         })
@@ -58,41 +49,31 @@ export default class Profile extends Component {
             }
         }
         
-        this.setState(({shrink}) => ({
+        this.setState({
             [name]: value,
-            shrink: {
-                ...shrink, 
-                [name]: Boolean(value)
-            },
             isValid: Boolean(value),
             isUserUpdate
-        }))
+        })
     }
 
     handleReset = () => {
         const { name, address } = this.state.origProfile;
-        this.setState({ 
-            name, address,
-            isUserUpdate: false,
-            shrink: {
-                name: true,
-                address: true,
-            },
-        });
+        this.setState({name, address, isUserUpdate: false});
     }
 
     save = () => {
         const { name, address } = this.state;
         saveUserProfile({ name, address })
-        .then(res => {
-            this.props.setHasProfile(true);
+        .then(() => {
             this.props.setHasProfile(true);
             this.props.handleClose();
+            this.props.alert.success("Successfully Saved!")
         })
+        .catch(() => this.props.alert.error("Error!"))
     }
 
     render() {
-        const { shrink, name, address, isUserUpdate, isValid } = this.state;
+        const { name, address, isUserUpdate, isValid } = this.state;
         return (
             <form autoComplete="off">
                 <TextField fullWidth
@@ -100,7 +81,7 @@ export default class Profile extends Component {
                     name="name"
                     label="Branch Name"
                     value={name}
-                    InputLabelProps={{ shrink: shrink.name }}
+                    InputLabelProps={{ shrink: Boolean(name) }}
                     onChange={this.handleChange}
                 />
                 <TextField fullWidth
@@ -108,7 +89,7 @@ export default class Profile extends Component {
                     name="address"
                     label="Address"
                     value={address}
-                    InputLabelProps={{ shrink: shrink.address }}
+                    InputLabelProps={{ shrink: Boolean(address) }}
                     onChange={this.handleChange}
                 />
                 <Grid container 
@@ -129,3 +110,5 @@ export default class Profile extends Component {
         )
     }
 }
+
+export default withAlert()(Profile)

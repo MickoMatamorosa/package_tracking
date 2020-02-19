@@ -56,15 +56,13 @@ class UserPackageViewSet(viewsets.ModelViewSet):
 class PackageStatusViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,]
     serializer_class = PackageStatusSerializer
-
-    def get_queryset(self):
-        package = self.request.query_params.get('package', None)
-        return PackageStatus.objects.filter(package=package)
+    queryset = PackageStatus.objects.all()
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.status.queue > 1:
             self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
 

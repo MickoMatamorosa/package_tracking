@@ -15,18 +15,10 @@ class BranchViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,]
     
     def get_queryset(self):
-        user = self.request.query_params.get('user', None)
-        _queryset = Branch.objects.all()
-        if user:
-            _queryset = _queryset.filter(user=user)
-        return _queryset
-    
+        return Branch.objects.filter(user=self.request.user)
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    def perform_update(self, serializer):
-        # tocode: check user id and branch user id
-        serializer.save()
 
 # other branch viewset
 class OtherBranchViewSet(viewsets.ModelViewSet):
@@ -37,15 +29,6 @@ class OtherBranchViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return Branch.objects.filter(~Q(user=user))
 
-# user branch viewset
-class UserBranchViewSet(viewsets.ModelViewSet):
-    serializer_class = BranchSerializer
-    permission_classes = [permissions.IsAuthenticated,]
-    queryset = Branch.objects.all()
-    
-    def get_queryset(self):
-        return [self.request.user.branch]
-
 
 # user's branch status flow viewset
 class StatusFlowViewSet(viewsets.ModelViewSet):
@@ -53,6 +36,9 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
     serializer_class = StatusFlowSerializer
 
     def get_queryset(self):
+        """ Getting the sender or receiver branch
+            fetch the status flow base on branch_type
+        """
         branch = self.request.query_params.get('branch', None)
         flow_type = self.request.query_params.get('branch_type', None)
         if flow_type == 'sending':
@@ -64,6 +50,7 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
         return _queryset.statusflow_set.filter(branch_type=flow_type)
 
     def perform_create(self, serializer):
+        """ Automate queuing on create"""
         queue_no = 1
         stype = self.request._data['branch_type'].lower()
         last_queue = StatusFlow.objects.filter(

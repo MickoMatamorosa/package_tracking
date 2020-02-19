@@ -33,18 +33,11 @@ class ChangePass extends Component {
     }
 
     save = () => {
-        if(this.state.new_password === this.state.confirm){
-            changePass(this.state)
-            .then(res => {
-                console.log("save success", res);
-                this.props.alert.success("Successfully Changed!");
-                this.props.handleClose();
-            })
-            .catch(err => {
-                console.log("save error", err);
-                this.props.alert.error("Incorrect Password");
-            })
-        }else this.props.alert.error("Password mismatched!");
+        changePass(this.state)
+        .then(({type, msg}) => {
+            if(type === "success") this.props.handleClose();
+            this.props.alert[type](msg);
+        })
 
         this.handleReset();
     }

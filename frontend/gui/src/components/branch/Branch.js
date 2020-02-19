@@ -74,16 +74,19 @@ class Branch extends Component {
         if(search.length) this.setState({search})
         else this.props.alert.error("Empty Search Field!!!");
     }
+
+    cancelSearch = () => this.setState({ search: "" })
     
     render() {
         const {submitTracking, setHasStatusFlow,
-            setHasProfile, props} = this
+            setHasProfile, props, cancelSearch} = this
         const {search, hasProfile, hasStatusFlow} = this.state
 
         return (
             <Fragment>
-                <Header {...props}
-                    {...{submitTracking, setHasStatusFlow, setHasProfile}}/>
+                <Header {...props} {...{
+                    search, submitTracking, cancelSearch,
+                    setHasStatusFlow, setHasProfile}}/>
                 <Packages {...props}
                     {...{search, hasProfile, hasStatusFlow}}/>
             </Fragment>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
+import { useAlert } from 'react-alert';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -34,6 +35,7 @@ const TblActions = ({row, setActive, setEditMode}) => {
 
 export default (props) => {
     const classes = useStyles();
+    const alert = useAlert();
     const [tableData, setTableData] = useState([]);
     const [queue, setQueue] = useState({
         sending: [], receiving: []
@@ -66,11 +68,15 @@ export default (props) => {
         if(editMode.description){
             updateStatusFlow(editMode)
             .then(() => {
-                setEditMode(null)
-                statusFlow()
+                setEditMode(null);
+                statusFlow();
+                alert.success("Successfully updated!");
             })
-            .catch(err => console.log(err, "update failed!"))
-        }else setError(true)
+            .catch(err => alert.error("Updating failed!"))
+        }else{
+            setError(true);
+            alert.error("Description is required!")
+        }
     }
 
     const handleDelete = () => {
@@ -78,6 +84,7 @@ export default (props) => {
         .then(() => {
             statusFlow();
             setActive(null);
+            alert.success("Status has been deleted!");
         })
     }
 

@@ -1,13 +1,16 @@
 import axios from 'axios';
 import { tokenConfig } from './headers';
 import {userAuth} from './authRequest'
+import auth from './auth'
 
 // branch profile
 export const branchProfile = () => {
     // user info instead branch if no branch
+    const path = `/api/branch/${auth.user}/`;
+
     return axios
-        .get("/api/auth/branch", tokenConfig())
-        .then(res => res.data[0])
+        .get(path, tokenConfig())
+        .then(res => res.data)
         .catch(err => userAuth()
             .then(res => res && ({ 
                 user: res.id, 
@@ -18,46 +21,24 @@ export const branchProfile = () => {
 }
 
 
-// get receiving branch profile (UNUSED)
-export const getReceiverBranch = id => {
-    return axios
-        .get(`/api/branch/others/${id}`, tokenConfig())
-        .then(res => res.data.name)
-}
-
-
-// get sending branch profile (UNUSED)
-export const getSenderBranch = id => {
-    console.log("s", id);
-
-    const path = `/api/branch?user=${id}`;
-    return axios
-        .get(path, tokenConfig())
-        .then(res => res.data[0].name)
-}
-
-
 // saveUserProfile branch profile
 export const saveUserProfile = body => {
-    return branchProfile().then(res => {
-        body.user = res.user;
-        const strBody = JSON.stringify(body);
-        const path = `/api/branch/${res.id}/`;
-        return axios
-            .patch(path, strBody, tokenConfig())
-            .then(res => res.data)
-            .catch(err => {
-                return axios
-                    .post(`/api/branch/`, strBody, tokenConfig())
-                    .then(res => res.data)
-                    .catch(err => err)
-            })
-    })
+    const user = auth.user
+    const strBody = JSON.stringify({...body, user});
+    const path = `/api/branch/${user}/`;
+    return axios
+        .patch(path, strBody, tokenConfig())
+        .then(res => res.data)
+        .catch(err => {
+            return axios
+                .post(`/api/branch`, strBody, tokenConfig())
+                .then(res => res.data)
+        })
 }
 
 // branch all status flow
 export const getBranchStatusFlow = () => {
-    const path = "/api/branch/statusflow?ordering=branch_type";
+    const path = "/api/branch/statusflow";
     return axios
         .get(path, tokenConfig())
         .then(res => res.data)
@@ -113,11 +94,6 @@ export const getBranchPackages = (params) => {
         : "";
         
     let path = `/api/user/package?${queryString}`;
-
-    console.log(queryString);
-    console.log(path);
-    
-    
 
     return axios
         .get(path, tokenConfig())

@@ -71,16 +71,19 @@ export default props => {
             getPackageStatusFlow();
             setAnchorEl(null);
             props.freshData();
+            alert.info("Transaction Status setted to done!")
         });
     }
 
     const undo = () => {
-        previousStatus(props.pack.id, activeStat)
-        .then(() => {
-            getPackageStatusFlow();
-            setAnchorEl(null);
+        previousStatus(activeStat)
+        .then(({type, msg}) => {
+            if(type === 'info'){
+                getPackageStatusFlow();
+                setAnchorEl(null);
+            }
+            alert[type](msg)
         })
-        .catch(() => alert.error("Can't undo first transaction status!"));
     }
     
     const handleClick = (event, stat) => {

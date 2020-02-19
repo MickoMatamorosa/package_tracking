@@ -28,8 +28,9 @@ const SignIn = props => {
         // is already logged-in
         if(localStorage.getItem('token')){
             userAuth().then(res => {
-                auth.login(() => props.history.push('/branch'))
-            }).catch(err => auth.logout(() => {}))
+                if(res) auth.login(() => props.history.push('/branch'))
+                else auth.logout(() => {})
+            })
         }
     }, [props.history])
 

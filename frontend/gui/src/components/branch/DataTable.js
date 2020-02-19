@@ -16,7 +16,6 @@ import { useStyles } from '../styles/Styler'
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 import PackageDetails from './PackageDetails'
 import TablePaginationActions from './PackagePagination';
-import NewPackage from './NewPackage';
 import ConfirmAction from '../common/ConfirmAction';
 import auth from '../../services/auth';
 
@@ -54,10 +53,10 @@ export default ({freshData, data, openNew, setOpenNew}) => {
     cancelPackage(active)
     .then(() => freshData());
   }
+  
 
   return (<Fragment>
     <PackageDetails {...{pack, closeView, freshData, active}}/>
-    <NewPackage {...{openNew, setOpenNew, freshData}}/>
     <ConfirmAction {...{
       active, setActive,
       actionFn, text: "cancel this package"

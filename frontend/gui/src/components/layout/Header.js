@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 
 import SearchIcon from '@material-ui/icons/Search';
+import Reset from '@material-ui/icons/Close';
 import { IconButton } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
@@ -44,6 +45,12 @@ const Header = props => {
         }
     }
 
+    const cancelSearch = () => {
+        setSearchTxt("")
+        props.cancelSearch()
+    }
+    
+
     return (
         <div className={classes.grow}>
         <AppBar position="static">
@@ -61,12 +68,18 @@ const Header = props => {
                     }}
                     inputProps={{ 'aria-label': 'search' }}
                     onChange={handleChange}
+                    value={searchTxt}
                 />
             </div>
             <div>
-                <IconButton onClick={() => props.submitTracking(searchTxt)}>
-                    <SearchIcon  className={classes.searchIcon}/>
-                </IconButton>
+                {   props.search
+                    ? <IconButton onClick={cancelSearch}>
+                        <Reset  className={classes.searchIcon}/>
+                      </IconButton>
+                    : <IconButton onClick={() => props.submitTracking(searchTxt)}>
+                        <SearchIcon  className={classes.searchIcon}/>
+                      </IconButton>
+                }
             </div>
             <div className={classes.grow} />
             <div>

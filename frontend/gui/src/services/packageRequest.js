@@ -56,9 +56,16 @@ export const doneStatus = (pack_id, stat_id) => {
 
 
 // back to previous status
-export const previousStatus = (pack_id, stat_id) => {
-    const path = `/api/package/status/${stat_id}/?package=${pack_id}`;
+export const previousStatus = (stat_id) => {
+    const path = `/api/package/status/${stat_id}/`;
 
     return axios.delete(path, tokenConfig())
-        .then(res => res.data)
+        .then(() => ({
+            "type": "info",
+            "msg": "back to previous transaction status"
+        }))
+        .catch(() => ({
+            "type": "error",
+            "msg": "Can't undo first transaction status!"
+        }))
 }

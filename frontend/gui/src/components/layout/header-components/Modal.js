@@ -14,6 +14,8 @@ import { userAuth } from '../../../services/authRequest';
 const ModalWrapper = props => {
     const classes = useStyles();
     const Component = props.component;
+    console.log(props.title);
+    
     
     return (<div className={classes.paper}>
         <h2 id="spring-modal-title">{ props.title }</h2>

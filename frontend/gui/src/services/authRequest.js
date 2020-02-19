@@ -37,8 +37,18 @@ export const logout = () => {
 
 // CHANGE PASSWORD
 export const changePass = body => {
+  if(body.new_password !== body.confirm){
+    return Promise.resolve({
+      type: 'error',
+      msg: 'Password mismatched!'
+    })
+  }
+
   const strBody = JSON.stringify(body);
   const path = "/api/auth/change-password";
 
-  return axios.patch(path, strBody, tokenConfig())
+  return axios
+    .patch(path, strBody, tokenConfig())
+    .then(() => ({type: 'success', msg: 'Successfully Changed!'}))
+    .catch(() => ({type: 'error', msg: 'Incorrect Password!'}))
 }
