@@ -1,1 +1,1 @@
-default_app_config = 'packages.apps.PackagesConfig'
+default_app_config = "packages.apps.PackagesConfig"

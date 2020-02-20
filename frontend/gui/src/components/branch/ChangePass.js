@@ -25,7 +25,7 @@ class ChangePass extends Component {
     }
 
     handleReset = () => {
-        this.setState({ 
+        this.setState({
             old_password: "",
             new_password: "",
             confirm: "",
@@ -77,7 +77,7 @@ class ChangePass extends Component {
                     justify="space-around"
                     style={{"marginTop": 15 }}>
                     <Button color="primary"
-                        onClick={this.save} 
+                        onClick={this.save}
                         variant="contained">
                         Save</Button>
                     <Button

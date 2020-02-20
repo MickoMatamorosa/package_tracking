@@ -19,7 +19,7 @@ import HeaderModal from './header-components/Modal';
 import HeaderMenu from './header-components/Menu';
 
 const Header = props => {
-    
+
     const classes = useStyles();
     const [searchTxt, setSearchTxt] = useState("")
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -49,7 +49,7 @@ const Header = props => {
         setSearchTxt("")
         props.cancelSearch()
     }
-    
+
 
     return (
         <div className={classes.grow}>
@@ -103,7 +103,7 @@ const Header = props => {
             open, modal, setOpen, setModal
         }} />
         <HeaderMenu {...props} {...{
-            handleOpen, setAnchorEl, 
+            handleOpen, setAnchorEl,
             handleMenuClose, anchorEl
         }} />
         </div>

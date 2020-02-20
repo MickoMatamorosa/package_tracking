@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 from django.contrib.auth.models import User
 
 
@@ -9,10 +8,10 @@ class Branch(models.Model):
     address = models.CharField(max_length=500, null=False)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
-        return '%s - %s' % (self.name, self.address)
+        return "%s - %s" % (self.name, self.address)
 
 
 class StatusFlow(models.Model):
@@ -22,7 +21,7 @@ class StatusFlow(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['branch_type', '-queue']
+        ordering = ["branch_type", "-queue"]
 
     def __str__(self):
-        return '%s - %s Q#%d' % (self.branch, self.branch_type, self.queue)
+        return "%s - %s Q#%d" % (self.branch, self.branch_type, self.queue)

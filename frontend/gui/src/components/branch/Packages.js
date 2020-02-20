@@ -30,7 +30,7 @@ export default props => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  
+
   const [openNew, setOpenNew] = useState(false);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
@@ -82,7 +82,7 @@ export default props => {
   const handleNewPackage = () => {
     console.log(props.hasProfile);
     console.log(props.hasStatusFlow);
-    
+
     if(!props.hasProfile) alert.error("Profile is Required!");
     if(!props.hasStatusFlow) alert.error("Status FLow is Required!");
     if(props.hasProfile && props.hasStatusFlow) setOpenNew(true);
@@ -107,7 +107,7 @@ export default props => {
               <ArrowDropDownIcon />
             </Button>
           </ButtonGroup>
-          
+
           <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
             {({ TransitionProps, placement }) => (
               <Grow
@@ -143,7 +143,7 @@ export default props => {
         <AddIcon />New Package
       </Fab>
     </div>
-    
+
     { data.length
       ? <DataTable {...props} {...{data, freshData, openNew, setOpenNew}}/>
       : <Grid container justify="center" style={{paddingTop: 100}}>

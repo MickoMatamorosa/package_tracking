@@ -16,7 +16,7 @@ import Delete from '@material-ui/icons/DeleteOutline';
 import Save from '@material-ui/icons/Save';
 import Close from '@material-ui/icons/Close';
 
-import { getBranchStatusFlow, updateStatusFlow, deleteStatusFlow 
+import { getBranchStatusFlow, updateStatusFlow, deleteStatusFlow
     } from '../../services/branchRequest';
 import { useStyles } from '../styles/Styler'
 import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
@@ -44,7 +44,7 @@ export default (props) => {
     const [error, setError] = useState(false)
     const [active, setActive] = useState(null)
 
-    const statusFlow = () => {        
+    const statusFlow = () => {
         getBranchStatusFlow()
             .then(res => {
                 if(res.length) props.setHasStatusFlow(true)
@@ -124,7 +124,7 @@ export default (props) => {
                           onChange={handleChange}
                           value={editMode.queue}
                           inputProps={{ 'aria-label': 'age' }}>
-                          { queue[editMode.branch_type].map(q => 
+                          { queue[editMode.branch_type].map(q =>
                               <option key={q} value={q}>{q}</option>
                           )}
                         </NativeSelect>
@@ -175,7 +175,7 @@ export default (props) => {
                 </StyledTableCell>
                 </StyledTableRow>
             ))}
-            {  !editMode && <AddStatusFlow {...{ 
+            {  !editMode && <AddStatusFlow {...{
                     queue, refreshTableData: statusFlow}}/>
             }
             </TableBody>

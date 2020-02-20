@@ -26,7 +26,7 @@ class Profile extends Component {
         .then(res => {
             const { name, address } = res
             const origProfile = { name, address }
-            
+
             this.setState({ name, address, origProfile})
         }).catch(err => {
             console.log("can't fetch branch profile", err)
@@ -48,7 +48,7 @@ class Profile extends Component {
                 isUserUpdate = true
             }
         }
-        
+
         this.setState({
             [name]: value,
             isValid: Boolean(value),
@@ -92,11 +92,11 @@ class Profile extends Component {
                     InputLabelProps={{ shrink: Boolean(address) }}
                     onChange={this.handleChange}
                 />
-                <Grid container 
+                <Grid container
                     justify="space-around"
                     style={{"marginTop": 15 }}
                     spacing={1}>
-                    <Button onClick={this.save} 
+                    <Button onClick={this.save}
                         disabled={!isUserUpdate || !isValid}
                         variant="contained" color="primary">
                         Save

@@ -33,7 +33,7 @@ export default ({queue, refreshTableData}) => {
         else {
             let data = state
             if(state.queue === ""){
-                data = { 
+                data = {
                     branch_type: state.branch_type,
                     description: state.description,
                 }
@@ -45,15 +45,15 @@ export default ({queue, refreshTableData}) => {
                 cancelAddNew()
             })
             .catch(err => console.log("error data", err))
-        }     
-        
+        }
+
     }
 
     const handleChange = e => {
         const { name, value } = e.target;
         setState({...state, [name]: value});
     }
-    
+
     const last = queue[state.branch_type][queue.length - 1] + 1;
 
     return (

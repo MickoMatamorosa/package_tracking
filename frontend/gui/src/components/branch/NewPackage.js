@@ -15,7 +15,7 @@ export default props => {
     const [client_fullname, setFullname] = useState("");
     const [client_address, setAddress] = useState("");
     const [to_branch, setSelectedBranch] = useState('');
-    
+
     useEffect(() => {
         getOtherBranchPackages()
         .then(res => setToBranch(res))
@@ -35,7 +35,7 @@ export default props => {
             setSelectedBranch("");
         })
     }
-    
+
     return (<Modal
         aria-labelledby="spring-modal-title"
         aria-describedby="spring-modal-description"
@@ -65,7 +65,7 @@ export default props => {
                         onChange={e => setAddress(e.target.value)}
                     />
                 </Grid>
-                <Grid item xs={6}>To: 
+                <Grid item xs={6}>To:
                     <Select style={{width: 250}}
                         id="branch-destination"
                         label="Branch Destination"

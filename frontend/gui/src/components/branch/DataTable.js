@@ -53,7 +53,7 @@ export default ({freshData, data, openNew, setOpenNew}) => {
     cancelPackage(active)
     .then(() => freshData());
   }
-  
+
 
   return (<Fragment>
     <PackageDetails {...{pack, closeView, freshData, active}}/>
@@ -105,7 +105,7 @@ export default ({freshData, data, openNew, setOpenNew}) => {
                 <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
                 <StyledTableCell align="center">
                   { !row.completed && auth.user === row.from_branch && (
-                    !row.cancel && 
+                    !row.cancel &&
                     <Button size="small" onClick={() => setActive(row.id)}>cancel</Button>
                   )}
                 </StyledTableCell>

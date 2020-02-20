@@ -48,7 +48,7 @@ export const getPackageStatus = id => {
 export const doneStatus = (pack_id, stat_id) => {
     const body = JSON.stringify({remarks: 'done'});
     const path = `/api/package/status/${stat_id}/?package=${pack_id}`;
-    
+
     // update current status to done
     return axios.patch(path, body, tokenConfig())
         .then(res => res.data)

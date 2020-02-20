@@ -15,8 +15,8 @@ const ModalWrapper = props => {
     const classes = useStyles();
     const Component = props.component;
     console.log(props.title);
-    
-    
+
+
     return (<div className={classes.paper}>
         <h2 id="spring-modal-title">{ props.title }</h2>
         <div id="spring-modal-description">
@@ -40,7 +40,7 @@ export default props => {
         props.handleMenuClose();
         props.setOpen(false);
     }
-    
+
     return (<Modal
         aria-labelledby="spring-modal-title"
         aria-describedby="spring-modal-description"
@@ -59,7 +59,7 @@ export default props => {
                 handleClose, title: "Transaction Status Flow",
                 component: StatusFlow
             }}/>
-            : (props.modal === 'change-pass' && 
+            : (props.modal === 'change-pass' &&
               <ModalWrapper {...props} {...{
                 handleClose, title: "Change Password",
                 component: ChangePass }}/>)

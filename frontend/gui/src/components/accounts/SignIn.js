@@ -19,7 +19,7 @@ import auth from '../../services/auth';
 import useStyles from './SignIn.style'
 
 const SignIn = props => {
-    
+
     const alert = useAlert();
     const classes = useStyles();
     const [input, setInput] = useState({username: "", password: ""});
@@ -41,7 +41,7 @@ const SignIn = props => {
     const submit = e => {
         e.preventDefault();
         setInput({...input, password: ""})
-        
+
         const {username, password} = input
         login(username, password)
         .then(res => {
@@ -51,7 +51,7 @@ const SignIn = props => {
             } else alert.error("Invalid Username or Password")
         })
     }
-   
+
 
     return (
         <Container component="main" maxWidth="xs">

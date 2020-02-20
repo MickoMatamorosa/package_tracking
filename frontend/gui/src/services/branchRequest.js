@@ -12,9 +12,9 @@ export const branchProfile = () => {
         .get(path, tokenConfig())
         .then(res => res.data)
         .catch(err => userAuth()
-            .then(res => res && ({ 
-                user: res.id, 
-                name: "", 
+            .then(res => res && ({
+                user: res.id,
+                name: "",
                 address: ""
             }))
         )
@@ -92,7 +92,7 @@ export const getBranchPackages = (params) => {
     const queryString = Boolean(params)
         ? Object.keys(params).map(key => key + '=' + params[key]).join('&')
         : "";
-        
+
     let path = `/api/user/package?${queryString}`;
 
     return axios

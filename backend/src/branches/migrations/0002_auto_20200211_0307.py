@@ -5,13 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('branches', '0001_initial'),
-    ]
+    dependencies = [("branches", "0001_initial")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='statusflow',
-            options={'ordering': ['branch_type', '-queue']},
-        ),
+            name="statusflow", options={"ordering": ["branch_type", "-queue"]}
+        )
     ]

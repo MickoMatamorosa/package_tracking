@@ -2,12 +2,7 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
 from rest_framework import status
-from django.contrib.auth.models import User
-from .serializers import (
-    UserSerializer, 
-    LoginSerializer, 
-    ChangePasswordSerializer
-)
+from .serializers import UserSerializer, LoginSerializer, ChangePasswordSerializer
 
 
 # Login API
@@ -18,15 +13,20 @@ class LoginAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
-        return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)[1]
-        })
+        return Response(
+            {
+                "user": UserSerializer(
+                    user, context=self.get_serializer_context()
+                ).data,
+                "token": AuthToken.objects.create(user)[1],
+            }
+        )
+
 
 class ChangePassAPI(generics.UpdateAPIView):
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ChangePasswordSerializer
-    
+
     def get_object(self, queryset=None):
         return self.request.user
 
@@ -40,7 +40,7 @@ class ChangePassAPI(generics.UpdateAPIView):
             if not self.object.check_password(old_password):
                 return Response(
                     {"error": ["Wrong old password."]},
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
             # set_password also hashes the password that the user will get
@@ -48,16 +48,16 @@ class ChangePassAPI(generics.UpdateAPIView):
             self.object.save()
             return Response(
                 {"success": ["Successfully Changed!"]},
-                status=status.HTTP_204_NO_CONTENT
+                status=status.HTTP_204_NO_CONTENT,
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 # Get User API
 class UserAPI(generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAuthenticated,]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
     def get_object(self):
         return self.request.user
-

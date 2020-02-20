@@ -3,11 +3,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 
+
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')
+        fields = ("id", "username", "email")
 
 
 # Login Serializer
@@ -26,6 +27,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     Serializer for password change endpoint.
     """
+
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 

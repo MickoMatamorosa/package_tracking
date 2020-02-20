@@ -46,7 +46,7 @@ export default props => {
             .then(res => setPackageStatus(res))
         }
     }
-    
+
     const handleClose = () => {
         setAnchorEl(null);
         props.freshData();
@@ -57,7 +57,7 @@ export default props => {
 
         if(props.pack.tracking_number){
             const { from_branch } = props.pack
-            
+
             if(auth.user===from_branch) setUserType("sending")
             else setUserType("receiving")
 
@@ -85,12 +85,12 @@ export default props => {
             alert[type](msg)
         })
     }
-    
+
     const handleClick = (event, stat) => {
         setAnchorEl(event.currentTarget);
         setActiveStat(stat);
     };
-    
+
     const open = Boolean(anchorEl);
     const id = open ? 'popover-actions' : undefined;
     const positions = {vertical: 'center', horizontal: 'center',}
@@ -126,11 +126,11 @@ export default props => {
                     <TableBody>{
                         receiveStat && sendStat && [...receiveStat, ...sendStat].map(stat => {
                             let timestamp = false;
-                            
-                            const packStat = packageStatus.filter(pack => 
+
+                            const packStat = packageStatus.filter(pack =>
                                 pack.package === props.pack.id &&
                                 pack.status === stat.id);
-                            
+
                             if(Boolean(packStat.length)){
                                 timestamp = packStat[0].timestamp
                             }

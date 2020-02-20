@@ -9,7 +9,7 @@ import { modalStyle } from '../styles/Styler';
 
 export default props => {
     const classes = modalStyle();
-    
+
     useEffect(() => {}, [props.active]);
 
     return (<Modal

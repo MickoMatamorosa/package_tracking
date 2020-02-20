@@ -59,7 +59,7 @@ export const modalStyle = makeStyles(theme => ({
         },
     },
     login: {
-        color: 'white', 
+        color: 'white',
         fontWeight: 'bold',
     },
     modal: {

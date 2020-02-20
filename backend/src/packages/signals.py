@@ -8,8 +8,7 @@ from branches.models import StatusFlow
 def init_status(sender, instance, created, **kwargs):
     if created:
         status = StatusFlow.objects.get(
-            queue=1, branch_type="sending", 
-            branch=instance.from_branch.branch
+            queue=1, branch_type="sending", branch=instance.from_branch.branch
         )
         PackageStatus.objects.create(package=instance, status=status)
 
@@ -21,18 +20,15 @@ def next_status(sender, instance, created, **kwargs):
             status = StatusFlow.objects.get(
                 queue=instance.status.queue + 1,
                 branch_type=instance.status.branch_type,
-                branch=instance.status.branch
+                branch=instance.status.branch,
             )
-            PackageStatus.objects.create(package=instance.package,
-                status=status)
-        except:
+            PackageStatus.objects.create(package=instance.package, status=status)
+        except Exception:
             if instance.status.branch_type == "sending":
                 status = StatusFlow.objects.get(
-                    queue=1, branch_type="receiving",
-                    branch=instance.package.to_branch
+                    queue=1, branch_type="receiving", branch=instance.package.to_branch
                 )
-                PackageStatus.objects.create(package=instance.package,
-                    status=status)
+                PackageStatus.objects.create(package=instance.package, status=status)
             elif instance.status.branch_type == "receiving":
                 package = Package.objects.get(pk=instance.package_id)
                 package.completed = True
@@ -47,11 +43,12 @@ def previous_status(sender, instance, **kwargs):
         status = StatusFlow.objects.get(
             queue=instance.status.queue - 1,
             branch_type=instance.status.branch_type,
-            branch=instance.status.branch
+            branch=instance.status.branch,
         )
 
         package_status = PackageStatus.objects.get(
-            package=instance.package, status=status)
+            package=instance.package, status=status
+        )
 
         package_status.remarks = "ongoing"
         package_status.save()
