@@ -28,7 +28,7 @@ class AccountAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_data(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
+        self.client.force_authenticate(user=self.user)
         response = self.client.get("/api/auth/user")
 
         self.assertEqual(
@@ -42,7 +42,7 @@ class AccountAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_change_password(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
+        self.client.force_authenticate(user=self.user)
         data = {"username": "lgp-drg", "password": "123daraga"}
         response = self.client.get("/api/auth/user", data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
