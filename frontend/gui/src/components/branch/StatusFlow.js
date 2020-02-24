@@ -168,9 +168,9 @@ export default (props) => {
                       ? <TblActions {...{row, setActive, setEditMode}} />
                       : <Fragment>
                             <IconButton onClick={ () => handleSave(row) }>
-                                <Save /></IconButton>
+                                <Save color="primary" /></IconButton>
                             <IconButton onClick={ () => setEditMode(null) }>
-                                <Close /></IconButton>
+                                <Close color="secondary" /></IconButton>
                         </Fragment>
                     }
                 </StyledTableCell>
