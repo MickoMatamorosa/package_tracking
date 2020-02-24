@@ -125,8 +125,9 @@ export default (props) => {
                           value={editMode.queue}
                           inputProps={{ 'aria-label': 'age' }}>
                           { queue[editMode.branch_type].map(q =>
-                              <option key={q} value={q}>{q}</option>
+                            <option key={q} value={q}>{q}</option>
                           )}
+                          <option key="a" value="">Last</option>
                         </NativeSelect>
                     }
                 </StyledTableCell>

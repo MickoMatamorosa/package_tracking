@@ -71,39 +71,53 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
 
+        if request.data["queue"] == "":
+            # assign last queue no
+            request.data["queue"] = (
+                1
+                + StatusFlow.objects.filter(
+                    branch=self.request.user.branch,
+                    branch_type=request.data["branch_type"],
+                )
+                .first()
+                .queue
+            )
+
         from_queue = instance.queue
         to_queue = int(request.data["queue"])
 
         status_flow_list = (
             StatusFlow.objects.filter(branch=instance.branch)
-            .exclude(queue=instance.queue)
-            .order_by("queue")
+            .exclude(id=instance.id)
+            .order_by("branch_type", "queue")
         )
 
         # adjust queuing
         if instance.branch_type != request.data["branch_type"]:
+            """
+                minus 1 to old status type which are > old queue no
+                add 1 to new status type which are >= new queue no
+            """
             for sf in status_flow_list:
                 if sf.queue > from_queue and sf.branch_type == instance.branch_type:
-                    # decrease queue value
                     self.adjust_status_flow(sf.id, -1)
                 elif (
                     sf.queue >= to_queue
                     and sf.branch_type == request.data["branch_type"]
                 ):
                     self.adjust_status_flow(sf.id, 1)
-        else:
-            if from_queue != to_queue:
-                status_flow_list = status_flow_list.filter(
-                    branch_type=instance.branch_type
-                )
+        elif from_queue != to_queue:
+            """add or minus 1 between old queue and new queue no"""
 
-                for sf in status_flow_list:
-                    if from_queue < sf.queue <= to_queue:
-                        # decrease queue value
-                        self.adjust_status_flow(sf.id, -1)
-                    elif from_queue > sf.queue >= to_queue:
-                        # increase queue value
-                        self.adjust_status_flow(sf.id, 1)
+            status_flow_list = status_flow_list.filter(branch_type=instance.branch_type)
+
+            for sf in status_flow_list:
+                if from_queue < sf.queue <= to_queue:
+                    # decrease queue value
+                    self.adjust_status_flow(sf.id, -1)
+                elif from_queue > sf.queue >= to_queue:
+                    # increase queue value
+                    self.adjust_status_flow(sf.id, 1)
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
