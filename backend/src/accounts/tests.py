@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
-from rest_framework.test import APITestCase
 from knox.models import AuthToken
+from rest_framework.test import APITestCase
+from rest_framework.reverse import reverse
 from rest_framework import status
 
 
@@ -21,23 +22,23 @@ class AuthenticationTestCase(TestCaseSetUp):
 
     def test_user_authenticated(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token)
-        response = self.client.get("/api/auth/user")
+        response = self.client.get(reverse("user-account"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_un_authenticated(self):
         self.client.credentials(HTTP_AUTHORIZATION="Invalid Token")
-        response = self.client.get("/api/auth/user")
+        response = self.client.get(reverse("user-account"))
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class UserTestCase(TestCaseSetUp):
-    """Check user authenticated user has correct data"""
+    """Check authenticated user get correct data"""
 
     def test_user_data(self):
         self.client.force_authenticate(user=self.user)
-        response = self.client.get("/api/auth/user")
+        response = self.client.get(reverse("user-account"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
@@ -51,6 +52,13 @@ class UserTestCase(TestCaseSetUp):
 
 
 class ChangePassWordTestCase(TestCaseSetUp):
+    """ Test:
+         * Update password using incorrect password
+         * Update password using correct password
+         * Login user with old password
+         * Login user with new password
+    """
+
     def setUp(self):
         super().setUp()
 
@@ -63,7 +71,7 @@ class ChangePassWordTestCase(TestCaseSetUp):
 
         # change password
         response = self.client.patch(
-            "/api/auth/change-password",
+            reverse("change_password"),
             {"old_password": "incorrect-password", "new_password": self.new_password},
         )
 
@@ -74,7 +82,7 @@ class ChangePassWordTestCase(TestCaseSetUp):
 
         # change password
         response = self.client.patch(
-            "/api/auth/change-password",
+            reverse("change_password"),
             {"old_password": self.old_password, "new_password": self.new_password},
         )
 
@@ -87,7 +95,7 @@ class ChangePassWordTestCase(TestCaseSetUp):
 
         # login using old password
         login_data = {"username": self.username, "password": self.old_password}
-        response = self.client.post("/api/auth/login", login_data)
+        response = self.client.post(reverse("user-login"), login_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_login_new_password(self):
@@ -96,5 +104,5 @@ class ChangePassWordTestCase(TestCaseSetUp):
 
         # login using new password
         login_data = {"username": self.username, "password": self.new_password}
-        response = self.client.post("/api/auth/login", login_data)
+        response = self.client.post(reverse("user-login"), login_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
