@@ -51,8 +51,6 @@ export default (props) => {
                 else props.setHasStatusFlow(false)
 
                 const queue = res.reduce(((acc, obj) => {
-                    console.log(acc);
-                    console.log(obj);
                     acc[obj.branch_type].push(obj.queue)
                     return acc
                 }), { sending: [], receiving: [] })
@@ -60,6 +58,11 @@ export default (props) => {
                 setQueue(queue)
             })
             .catch(err => console.log(err))
+
+        // getBranchProfile()
+        // .then(res => {
+        //     if(!res) props.setHasProfile(true)
+        // })
     }
 
     useEffect(() => statusFlow(), [])

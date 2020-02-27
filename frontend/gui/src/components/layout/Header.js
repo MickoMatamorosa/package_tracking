@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAlert } from 'react-alert';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -12,6 +13,7 @@ import { IconButton } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import auth from '../../services/auth';
+import { branchProfile } from '../../services/branchRequest';
 
 import useStyles from '../styles/Header.style';
 
@@ -19,7 +21,7 @@ import HeaderModal from './header-components/Modal';
 import HeaderMenu from './header-components/Menu';
 
 const Header = props => {
-
+    const alert = useAlert();
     const classes = useStyles();
     const [searchTxt, setSearchTxt] = useState("")
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -34,8 +36,21 @@ const Header = props => {
 
     const handleOpen = type => {
         handleMenuClose();
-        setOpen(true);
-        setModal(type)
+        if(type==='status-flow'){
+            branchProfile()
+            .then(res => {
+                if (res.name) {
+                    setModal(type)
+                    setOpen(true);
+                } else {
+                    alert.info('Please set your profile first!')
+                }
+            })
+        }else{
+            setOpen(true);
+            setModal(type)
+        }
+
     }
 
     const handleChange = e => {

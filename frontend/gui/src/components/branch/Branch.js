@@ -43,8 +43,8 @@ class Branch extends Component {
 
             const {name, address} = res
             this.setState({name, address})
-            this.setHasProfile(true)
-        }).catch(() => this.setHasProfile(false))
+            if(name) this.setHasProfile(true)
+        })
 
         getBranchStatusFlow()
         .then(res => {

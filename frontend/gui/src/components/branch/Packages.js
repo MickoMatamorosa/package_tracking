@@ -80,9 +80,6 @@ export default props => {
   }, [props.search, props.hasProfile, props.hasStatusFlow, selectedIndex]);
 
   const handleNewPackage = () => {
-    console.log(props.hasProfile);
-    console.log(props.hasStatusFlow);
-
     if(!props.hasProfile) alert.error("Profile is Required!");
     if(!props.hasStatusFlow) alert.error("Status FLow is Required!");
     if(props.hasProfile && props.hasStatusFlow) setOpenNew(true);

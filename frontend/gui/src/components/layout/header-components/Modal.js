@@ -10,6 +10,7 @@ import ChangePass from '../../branch/ChangePass';
 
 import auth from '../../../services/auth';
 import { userAuth } from '../../../services/authRequest';
+import { branchProfile } from '../../../services/branchRequest';
 
 const ModalWrapper = props => {
     const classes = useStyles();
@@ -28,6 +29,13 @@ const ModalWrapper = props => {
 export default props => {
     const classes = useStyles();
 
+    console.log(props)
+
+    const handleClose = () => {
+        props.handleMenuClose();
+        props.setOpen(false);
+    }
+
     useEffect(() => {
         if(localStorage.getItem('token')){
             userAuth().then(() => {
@@ -35,11 +43,6 @@ export default props => {
             }).catch(() => auth.logout(() => {}));
         }else auth.logout(() => {})
     }, [props.history])
-
-    const handleClose = () => {
-        props.handleMenuClose();
-        props.setOpen(false);
-    }
 
     return (<Modal
         aria-labelledby="spring-modal-title"

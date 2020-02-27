@@ -31,7 +31,7 @@ export const saveUserProfile = body => {
         .then(res => res.data)
         .catch(err => {
             return axios
-                .post(`/api/branch`, strBody, tokenConfig())
+                .post(`/api/branch/`, strBody, tokenConfig())
                 .then(res => res.data)
         })
 }
