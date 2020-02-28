@@ -1,8 +1,11 @@
 from rest_framework import routers
-from packages.api import PackageViewSet, UserPackageViewSet
+from packages import api
 
 router = routers.SimpleRouter()
-router.register('api/package', PackageViewSet, 'package')
-router.register('api/user/package', UserPackageViewSet, 'user-packages')
+router.register(
+    r"^api/guest/package/(?P<trace>\d+)", api.PackageStatusGuestViewSet, "guest-package"
+)
+router.register(r"api/package/status", api.PackageStatusViewSet, "package-status")
+router.register(r"api/user/package", api.UserPackageViewSet, "user-packages")
 
 urlpatterns = router.urls

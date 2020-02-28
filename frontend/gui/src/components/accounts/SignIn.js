@@ -1,6 +1,6 @@
-import { Redirect } from "react-router-dom";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'
+import { useAlert } from 'react-alert'
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -10,36 +10,29 @@ import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-import { login } from '../../services/auth';
 
+import { login, userAuth } from '../../services/authRequest';
+import auth from '../../services/auth';
 
-const useStyles = makeStyles(theme => ({
-    paper: {
-        marginTop: theme.spacing(8),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    avatar: {
-        margin: theme.spacing(1),
-        backgroundColor: theme.palette.secondary.main,
-    },
-    form: {
-        width: '100%',
-        marginTop: theme.spacing(1),
-    },
-    submit: {
-        margin: theme.spacing(3, 0, 2),
-    },
-}));
+import useStyles from './SignIn.style'
 
 const SignIn = props => {
-    
+
+    const alert = useAlert();
     const classes = useStyles();
-    const [input, setInput] = useState({});
+    const [input, setInput] = useState({username: "", password: ""});
+
+    useEffect(() => {
+        // is already logged-in
+        if(localStorage.getItem('token')){
+            userAuth().then(res => {
+                if(res) auth.login(() => props.history.push('/branch'))
+                else auth.logout(() => {})
+            })
+        }
+    }, [props.history])
 
     const handleInputChange = (e) => setInput({
         ...input, [e.currentTarget.name]: e.currentTarget.value
@@ -47,18 +40,18 @@ const SignIn = props => {
 
     const submit = e => {
         e.preventDefault();
-        
+        setInput({...input, password: ""})
+
         const {username, password} = input
         login(username, password)
         .then(res => {
-            console.log(props);
-            
-            props.setUser(res.user);
-            props.setIsAuth(true);
+            if(res) {
+                alert.success("Successfully Logged In!")
+                auth.login(() => props.history.push('/branch'))
+            } else alert.error("Invalid Username or Password")
         })
     }
 
-    if(props.isAuth) return <Redirect to="/branch" />;
 
     return (
         <Container component="main" maxWidth="xs">
@@ -66,7 +59,7 @@ const SignIn = props => {
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}><LockOutlinedIcon /></Avatar>
                 <Typography component="h1" variant="h5">Sign in</Typography>
-                <form method="POST" onSubmit={submit} className={classes.form} noValidate>
+                <form method="POST" onSubmit={submit} className={classes.form}>
                     <TextField
                         onChange={handleInputChange}
                         variant="outlined"
@@ -75,6 +68,7 @@ const SignIn = props => {
                         fullWidth
                         label="Username"
                         name="username"
+                        value={input.username}
                         autoFocus
                     />
                     <TextField
@@ -88,6 +82,7 @@ const SignIn = props => {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        value={input.password}
                     />
                     <Button
                         type="submit"
@@ -100,11 +95,11 @@ const SignIn = props => {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link href="/" variant="body2">Back</Link>
+                            <Link href="#" variant="body2">Forgot password?</Link>
                         </Grid>
                         <Grid item xs>
-                            <Grid container alignContent="flex-end">
-                                <Link href="#" variant="body2">Forgot password?</Link>
+                            <Grid container justify="flex-end" >
+                                <Link href="/" variant="body2">Back</Link>
                             </Grid>
                         </Grid>
                     </Grid>

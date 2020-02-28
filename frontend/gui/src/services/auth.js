@@ -1,11 +1,22 @@
-import axios from 'axios'
+class Auth {
+    constructor() {
+        this.authenticated = false;
+        this.user = null;
+    }
 
-const config = { headers: { "Content-Type": "application/json" } };
+    login(cb) {
+        this.authenticated = true;
+        cb();
+    }
 
-export const login = async (username, password) => {
-    const body = JSON.stringify({ username, password });
-    return await axios
-        .post("/api/auth/login", body, config)
-        .then(res => res.data)
-        .catch(err => console.log(err));
+    logout(cb) {
+        this.authenticated = false;
+        cb();
+    }
+
+    isAuthenticated() {
+        return this.authenticated;
+    }
 }
+
+export default new Auth();

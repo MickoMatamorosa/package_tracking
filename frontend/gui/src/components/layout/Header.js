@@ -1,65 +1,70 @@
 import React, { useState } from 'react';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import { useAlert } from 'react-alert';
+
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
-import SearchIcon from '@material-ui/icons/Search';
-import Link from '@material-ui/core/Link';
-import { IconButton } from '@material-ui/core';
 
-const useStyles = makeStyles(theme => ({
-    grow: {
-        flexGrow: 1,
-    },
-    title: {
-        display: 'none',
-        [theme.breakpoints.up('sm')]: {
-            display: 'block',
-        },
-    },
-    search: {
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
-        },
-        marginRight: theme.spacing(1),
-        marginLeft: 0,
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            marginLeft: theme.spacing(3),
-            width: 'auto',
-        },
-    },
-    searchIcon: {
-        color: 'white'
-    },
-    inputRoot: {
-        color: 'inherit',
-    },
-    inputInput: {
-        padding: theme.spacing(1, 1, 1, 1),
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-            width: 200,
-        },
-    },
-    login: {
-        color: 'white', 
-        fontWeight: 'bold'
-    }
-}));
+import SearchIcon from '@material-ui/icons/Search';
+import Reset from '@material-ui/icons/Close';
+import { IconButton } from '@material-ui/core';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+
+import auth from '../../services/auth';
+import { branchProfile } from '../../services/branchRequest';
+
+import useStyles from '../styles/Header.style';
+
+import HeaderModal from './header-components/Modal';
+import HeaderMenu from './header-components/Menu';
 
 const Header = props => {
+    const alert = useAlert();
     const classes = useStyles();
     const [searchTxt, setSearchTxt] = useState("")
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [modal, setModal] = useState(false);
+    const [open, setOpen] = useState(false);
 
-    const submitTracking = () => {
-        console.log(searchTxt)
+    const handleProfileMenuOpen = e => {
+        setAnchorEl(e.currentTarget);
+    };
+
+    const handleMenuClose = () => setAnchorEl(null);
+
+    const handleOpen = type => {
+        handleMenuClose();
+        if(type==='status-flow'){
+            branchProfile()
+            .then(res => {
+                if (res.name) {
+                    setModal(type)
+                    setOpen(true);
+                } else {
+                    alert.info('Please set your profile first!')
+                }
+            })
+        }else{
+            setOpen(true);
+            setModal(type)
+        }
+
     }
+
+    const handleChange = e => {
+        setSearchTxt(e.target.value)
+        if(!e.target.value) {
+            props.submitTracking("")
+        }
+    }
+
+    const cancelSearch = () => {
+        setSearchTxt("")
+        props.cancelSearch()
+    }
+
 
     return (
         <div className={classes.grow}>
@@ -77,20 +82,45 @@ const Header = props => {
                         input: classes.inputInput,
                     }}
                     inputProps={{ 'aria-label': 'search' }}
-                    onChange={e => setSearchTxt(e.target.value)}
+                    onChange={handleChange}
+                    value={searchTxt}
                 />
             </div>
             <div>
-                <IconButton size="small" onClick={submitTracking}>
-                    <SearchIcon  className={classes.searchIcon}/>
-                </IconButton>
+                {   props.search
+                    ? <IconButton onClick={cancelSearch}>
+                        <Reset  className={classes.searchIcon}/>
+                      </IconButton>
+                    : <IconButton onClick={() => props.submitTracking(searchTxt)}>
+                        <SearchIcon  className={classes.searchIcon}/>
+                      </IconButton>
+                }
             </div>
             <div className={classes.grow} />
             <div>
-                <Link href="/login" className={classes.login}>LOGIN</Link>
+                { auth.authenticated
+                  ? <IconButton
+                      edge="end"
+                      aria-label="account of current user"
+                      aria-controls="primary-search-account-menu"
+                      aria-haspopup="true"
+                      onClick={handleProfileMenuOpen}
+                      color="inherit">
+                      <AccountCircle />
+                    </IconButton>
+                  : <Link href="/login" className={classes.login}>LOGIN</Link>
+                }
             </div>
             </Toolbar>
         </AppBar>
+        <HeaderModal {...props} {...{
+            handleOpen, handleMenuClose,
+            open, modal, setOpen, setModal
+        }} />
+        <HeaderMenu {...props} {...{
+            handleOpen, setAnchorEl,
+            handleMenuClose, anchorEl
+        }} />
         </div>
     );
 }
