@@ -34,6 +34,8 @@ export default ({freshData, data, openNew, setOpenNew}) => {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [pack, setPack] = useState(defaultPack);
   const [active, setActive] = useState(null);
+  const [selTrace, setSelTrace] = useState(null);
+  const [label, setLabel] = useState(null);
 
   const closeView = () => setPack(defaultPack);
 
@@ -54,11 +56,16 @@ export default ({freshData, data, openNew, setOpenNew}) => {
     .then(() => freshData());
   }
 
+  const handleCancel = (id, trace) => {
+    setActive(id);
+    setSelTrace(trace);
+  }
+
 
   return (<Fragment>
     <PackageDetails {...{pack, closeView, freshData, active}}/>
     <ConfirmAction {...{
-      active, setActive,
+      active, setActive, title: selTrace, label,
       actionFn, text: "cancel this package"
     }}/>
 
@@ -106,7 +113,7 @@ export default ({freshData, data, openNew, setOpenNew}) => {
                 <StyledTableCell align="center">
                   { !row.completed && auth.user === row.from_branch && (
                     !row.cancel &&
-                    <Button size="small" onClick={() => setActive(row.id)}>cancel</Button>
+                    <Button size="small" onClick={() => handleCancel(row.id, row.tracking_number)}>cancel</Button>
                   )}
                 </StyledTableCell>
               </StyledTableRow>

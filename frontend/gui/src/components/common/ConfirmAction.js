@@ -22,9 +22,9 @@ export default props => {
         BackdropComponent={Backdrop}
         BackdropProps={{timeout: 500}}>
         <div className={classes.paper}>
-            <h2 id="spring-modal-title">{props.active}</h2>
+            <h2 id="spring-modal-title">{props.title}</h2>
             <div id="spring-modal-description">
-                Are you sure you want to {props.text} {props.active}?
+                Are you sure you want to {props.text}{props.label}?
             </div>
             <div>
                 <Button onClick={props.actionFn}>OK</Button>

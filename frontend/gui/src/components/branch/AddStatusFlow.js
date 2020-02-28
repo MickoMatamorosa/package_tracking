@@ -37,14 +37,14 @@ export default ({queue, refreshTableData}) => {
                     branch_type: state.branch_type,
                     description: state.description,
                 }
-            }
+            }else data.queue = Number(data.queue)
+
             addBranchStatusFlow(data)
             .then(res => {
-                console.log("new data added", data)
                 refreshTableData();
                 cancelAddNew()
             })
-            .catch(err => console.log("error data", err))
+            .catch(err => {})
         }
 
     }
@@ -64,7 +64,7 @@ export default ({queue, refreshTableData}) => {
                     name="queue"
                     className={classes.selectEmpty}
                     defaultValue={last}
-                    inputProps={{ 'aria-label': 'age' }}>
+                    inputProps={{ 'aria-label': 'queue' }}>
                     { queue[state.branch_type].map(q => (<option key={q} value={q}>{q}</option>)) }
                     <option value={last}>Last</option>
                   </NativeSelect>
@@ -75,7 +75,7 @@ export default ({queue, refreshTableData}) => {
                     onChange={handleChange}
                     name="branch_type"
                     className={classes.selectEmpty}
-                    inputProps={{ 'aria-label': 'age' }}>
+                    inputProps={{ 'aria-label': 'branch type' }}>
                     <option value="sending">Sending</option>
                     <option value="receiving">Receiving</option>
                   </NativeSelect>

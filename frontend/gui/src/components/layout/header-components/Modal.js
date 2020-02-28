@@ -15,8 +15,6 @@ import { branchProfile } from '../../../services/branchRequest';
 const ModalWrapper = props => {
     const classes = useStyles();
     const Component = props.component;
-    console.log(props.title);
-
 
     return (<div className={classes.paper}>
         <h2 id="spring-modal-title">{ props.title }</h2>
@@ -28,8 +26,6 @@ const ModalWrapper = props => {
 
 export default props => {
     const classes = useStyles();
-
-    console.log(props)
 
     const handleClose = () => {
         props.handleMenuClose();

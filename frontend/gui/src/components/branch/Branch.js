@@ -22,25 +22,13 @@ class Branch extends Component {
         }
     }
 
-    setHasProfile = bool => {
-        console.log("Branch => sethasprofile");
+    setHasProfile = bool => this.setState({hasProfile: bool})
 
-        this.setState({hasProfile: bool})
-    }
-
-    setHasStatusFlow = bool => {
-        console.log("Branch => sethasstatusflow");
-
-        this.setState({hasStatusFlow: bool})
-    }
+    setHasStatusFlow = bool => this.setState({hasStatusFlow: bool})
 
     checkUser = () => {
-        console.log("Branch => checkuser");
-
         branchProfile()
         .then(res => {
-            console.log("Branch => checkuser.branchprofile.then");
-
             const {name, address} = res
             this.setState({name, address})
             if(name) this.setHasProfile(true)
@@ -48,8 +36,6 @@ class Branch extends Component {
 
         getBranchStatusFlow()
         .then(res => {
-            console.log("Branch => checkuser.getbranchstatusflow");
-
             if(res.length){
                 this.setHasStatusFlow(true)
             }else this.setHasStatusFlow(false)
@@ -57,8 +43,6 @@ class Branch extends Component {
     }
 
     componentDidMount(){
-        console.log("Branch => componentdidmount");
-
         if(localStorage.getItem('token')){
             userAuth()
                 .then(res => {

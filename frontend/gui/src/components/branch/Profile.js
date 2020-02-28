@@ -28,9 +28,7 @@ class Profile extends Component {
             const origProfile = { name, address }
 
             this.setState({ name, address, origProfile})
-        }).catch(err => {
-            console.log("can't fetch branch profile", err)
-        })
+        }).catch(err => {})
     }
 
     handleChange = e => {

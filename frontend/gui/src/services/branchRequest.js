@@ -80,9 +80,7 @@ export const deleteStatusFlow = id => {
     const path = `/api/branch/statusflow/${id}`;
     return axios
         .delete(path, tokenConfig())
-        .then(res => {
-            console.log(id, "has been deleted");
-        })
+        .then(res => {})
         .catch(err => err)
 }
 

@@ -24,11 +24,11 @@ import { StyledTableRow, StyledTableCell } from '../styles/Table.styles'
 import AddStatusFlow from './AddStatusFlow'
 import ConfirmAction from '../common/ConfirmAction';
 
-const TblActions = ({row, setActive, setEditMode}) => {
+const TblActions = ({row, handleConfirmFields, setEditMode}) => {
     return (<Fragment>
         <IconButton onClick={() => setEditMode(row)}>
             <Edit color="primary"/></IconButton>
-        <IconButton onClick={() => setActive(row.id)}>
+        <IconButton onClick={() => handleConfirmFields(row)}>
             <Delete color="secondary" /></IconButton>
     </Fragment>)
 }
@@ -43,6 +43,8 @@ export default (props) => {
     const [editMode, setEditMode] = useState(null)
     const [error, setError] = useState(false)
     const [active, setActive] = useState(null)
+    const [title, setTitle] = useState(null)
+    const [label, setLabel] = useState(null)
 
     const statusFlow = () => {
         getBranchStatusFlow()
@@ -57,12 +59,7 @@ export default (props) => {
                 setTableData(res)
                 setQueue(queue)
             })
-            .catch(err => console.log(err))
-
-        // getBranchProfile()
-        // .then(res => {
-        //     if(!res) props.setHasProfile(true)
-        // })
+            .catch(err => {})
     }
 
     useEffect(() => statusFlow(), [])
@@ -96,10 +93,16 @@ export default (props) => {
         setEditMode({...editMode, [name]: value});
     }
 
+    const handleConfirmFields = (sf) => {
+        setActive(sf.id)
+        setTitle(`Queue #${sf.queue} (${sf.branch_type})`)
+        setLabel(" this transaction flow")
+    }
+
     return (<Fragment>
         <ConfirmAction {...{
-            active, setActive,
-            text: "delete",
+            active, setActive, title,
+            text: "delete", label,
             actionFn: handleDelete}}/>
         <TableContainer component={Paper}>
         <Table className={classes.table} size='small' aria-label="customized table">
@@ -166,9 +169,9 @@ export default (props) => {
                 </StyledTableCell>
                 <StyledTableCell className={classes.actions} align="center">
                     { !editMode
-                    ? <TblActions {...{row, setActive, setEditMode}} />
+                    ? <TblActions {...{row, handleConfirmFields, setEditMode}} />
                     : editMode.id !== row.id
-                      ? <TblActions {...{row, setActive, setEditMode}} />
+                      ? <TblActions {...{row, handleConfirmFields, setEditMode}} />
                       : <Fragment>
                             <IconButton onClick={ () => handleSave(row) }>
                                 <Save color="primary" /></IconButton>

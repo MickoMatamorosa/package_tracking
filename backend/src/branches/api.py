@@ -4,6 +4,7 @@ from .models import Branch, StatusFlow
 from django.db.models import Q
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework import status
 
 
 # user's branch viewset
@@ -54,6 +55,7 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
         """ Automate queuing on create"""
         queue_no = 1
         stype = self.request._data["branch_type"].lower()
+
         last_queue = StatusFlow.objects.filter(
             branch=self.request.user.branch, branch_type=stype
         ).first()
@@ -127,3 +129,21 @@ class StatusFlowViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
 
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        status_flow_list = (
+            StatusFlow.objects.filter(
+                branch=instance.branch, branch_type=instance.branch_type
+            )
+            .exclude(id=instance.id)
+            .order_by("branch_type", "queue")
+        )
+
+        for sf in status_flow_list:
+            if sf.queue > instance.queue:
+                self.adjust_status_flow(sf.id, -1)
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
