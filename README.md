@@ -4,7 +4,7 @@ A simple tracking system that allows client to view thier package status using i
 
 ### Clone the repository
 
-    $ git clone https://dev.izeni.net/boom-backend-19/package-tracking.git
+    $ git clone https://github.com/MickoMatamorosa/package_tracking.git
 
 
 
